@@ -342,6 +342,7 @@
 {% macro datetimeField(name, value, label = '', options = {}) %}
    {% set options = {'rand': random()}|merge(options) %}
    {% set options = {'id': name|slug ~ '_' ~ options.rand}|merge(options) %}
+   {% set options = {'on_change':''}|merge(options) %}
    {% set locale = get_current_locale() %}
 
    {% set field %}
@@ -361,6 +362,9 @@
             allowInput: {{ options.readonly ? 'false' : 'true' }},
             clickOpens: {{ options.readonly ? 'false' : 'true' }},
             locale: getFlatPickerLocale('{{ locale['language'] }}', '{{ locale['region'] }}'),
+             onChange: function(selectedDates, dateStr, instance) {
+               {{ options.on_change|raw }}
+            },
             onClose(dates, currentdatestring, picker) {
                picker.setDate(picker.altInput.value, true, picker.config.altFormat)
             },

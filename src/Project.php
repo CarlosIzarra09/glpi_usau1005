@@ -1670,24 +1670,83 @@ class Project extends CommonDBTM implements ExtraVisibilityCriteria
 
         echo "<tr><td colspan='4' class='subheader'>" . __('Planning') . "</td></tr>";
 
+         /** 
+         * Con las fechas planned
+        */
+
+        $randPlannedStartDate = mt_rand();
+        $randPlannedEndDate = mt_rand();
+
+        //Controlamos la fecha minima que podrá seleccionar el PlannedEndDatefield cuando se
+        //asigna fecha al PlannedStartDatefield
+        $controlPlannedMinDate = "
+        const fpPlannedEndDate = document.querySelector('#showdate{$randPlannedEndDate}')._flatpickr
+        const newPlannedENDminDate = new Date(dateStr);
+        newPlannedENDminDate.setDate(newPlannedENDminDate.getDate() + 1);
+        fpPlannedEndDate.config.minDate = newPlannedENDminDate;
+        ";
+
+        //Controlamos la fecha máxima que podrá seleccionar el PlannedStartDatefield cuando se
+        //asigna fecha al PlannedEndDatefield
+        $controlPlannedMaxDate = "
+        const fpPlannedStartDate = document.querySelector('#showdate{$randPlannedStartDate}')._flatpickr
+        const newPlannedSTARTmaxDate = new Date(dateStr);
+        fpPlannedStartDate.config.maxDate = newPlannedSTARTmaxDate;
+        ";
+
+          /** 
+           * Con las fechas REAL planned */
+
+        $randRealPlannedStartDate = mt_rand();
+        $randRealPlannedEndDate = mt_rand();
+
+        //Controlamos la fecha minima que podrá seleccionar el RealPlannedEndDatefield cuando se
+        //asigna fecha al RealPlannedStartDatefield
+        $controlRealPlannedMinDate = "
+        const fpRealPlannedEndDate = document.querySelector('#showdate{$randRealPlannedEndDate}')._flatpickr
+        const newRealPlannedENDminDate = new Date(dateStr);
+        newRealPlannedENDminDate.setDate(newRealPlannedENDminDate.getDate() + 1);
+        fpRealPlannedEndDate.config.minDate = newRealPlannedENDminDate;
+        ";
+
+        //Controlamos la fecha máxima que podrá seleccionar el RealPlannedStartDatefield cuando se
+        //asigna fecha al RealPlannedEndDatefield
+        $controlRealPlannedMaxDate = "
+        const fpRealPlannedStartDate = document.querySelector('#showdate{$randRealPlannedStartDate}')._flatpickr
+        const newRealPlannedSTARTmaxDate = new Date(dateStr);
+        fpRealPlannedStartDate.config.maxDate = newRealPlannedSTARTmaxDate;
+        ";
+
         echo "<tr class='tab_bg_1'>";
         echo "<td>" . __('Planned start date') . "</td>";
         echo "<td>";
-        Html::showDateTimeField("plan_start_date", ['value' => $this->fields['plan_start_date']]);
+        Html::showDateTimeField("plan_start_date", ['value' => $this->fields['plan_start_date'],
+        'rand' => $randPlannedStartDate,
+        'on_change' => $controlPlannedMinDate
+        ]);
         echo "</td>";
         echo "<td>" . __('Real start date') . "</td>";
         echo "<td>";
-        Html::showDateTimeField("real_start_date", ['value' => $this->fields['real_start_date']]);
+        Html::showDateTimeField("real_start_date", ['value' => $this->fields['real_start_date'],
+        'rand' => $randRealPlannedStartDate,
+        'on_change' => $controlRealPlannedMinDate
+        ]);
         echo "</td></tr>\n";
 
         echo "<tr class='tab_bg_1'>";
         echo "<td>" . __('Planned end date') . "</td>";
         echo "<td>";
-        Html::showDateTimeField("plan_end_date", ['value' => $this->fields['plan_end_date']]);
+        Html::showDateTimeField("plan_end_date", ['value' => $this->fields['plan_end_date'],
+        'rand' => $randPlannedEndDate,
+        'on_change' => $controlPlannedMaxDate
+        ]);
         echo "</td>";
         echo "<td>" . __('Real end date') . "</td>";
         echo "<td>";
-        Html::showDateTimeField("real_end_date", ['value' => $this->fields['real_end_date']]);
+        Html::showDateTimeField("real_end_date", ['value' => $this->fields['real_end_date'],
+        'rand' => $randRealPlannedEndDate,
+        'on_change' => $controlRealPlannedMaxDate
+        ]);
         echo "</td></tr>\n";
 
         echo "<tr class='tab_bg_1'>";

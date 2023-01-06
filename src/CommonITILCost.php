@@ -429,9 +429,32 @@ abstract class CommonITILCost extends CommonDBChild
 
         echo Html::input('name', ['value' => $this->fields['name']]);
         echo "</td>";
+
+        //DATE FIELDS
+        $randBeginDate = mt_rand();
+        $randEndDate = mt_rand();
+
+        //Controlamos la fecha minima que podrá seleccionar el EndDatefield cuando se
+        //asigna fecha al BeginDatefield
+        $controlMinDate = "
+        const fpEndDate = document.querySelector('#showdate{$randEndDate}')._flatpickr
+        const newENDminDate = new Date(dateStr);
+        newENDminDate.setDate(newENDminDate.getDate() + 1);
+        fpEndDate.config.minDate = newENDminDate;
+        ";
+
+        //Controlamos la fecha máxima que podrá seleccionar el BeginDatefield cuando se
+        //asigna fecha al EndDatefield
+        $controlMaxDate = "
+        const fpBeginDate = document.querySelector('#showdate{$randBeginDate}')._flatpickr
+        const newBEGINmaxDate = new Date(dateStr);
+        fpBeginDate.config.maxDate = newBEGINmaxDate;
+        ";
         echo "<td>" . __('Begin date') . "</td>";
         echo "<td>";
-        Html::showDateField("begin_date", ['value' => $this->fields['begin_date']]);
+        Html::showDateField("begin_date", ['value' => $this->fields['begin_date'],
+        'rand' => $randBeginDate,
+        'on_change' => $controlMinDate]);
         echo "</td>";
         echo "</tr>";
 
@@ -444,14 +467,18 @@ abstract class CommonITILCost extends CommonDBChild
         echo "</td>";
         echo "<td>" . __('End date') . "</td>";
         echo "<td>";
-        Html::showDateField("end_date", ['value' => $this->fields['end_date']]);
+        Html::showDateField("end_date", ['value' => $this->fields['end_date'],
+        'rand' => $randEndDate,
+        'on_change' => $controlMaxDate]);
         echo "</td>";
         echo "</tr>";
 
         echo "<tr class='tab_bg_1'>";
         echo "<td>" . __('Time cost') . "</td><td>";
-        echo "<input type='text' class='form-control' size='15' name='cost_time' value='" .
-             Html::formatNumber($this->fields["cost_time"], true) . "'>";
+        echo "<input type='text' class='form-control' size='15' name='cost_time' 
+            onkeypress='return event.charCode >= 48 && event.charCode <= 57 || event.charCode === 46'    
+            value='" .
+            Html::formatNumber($this->fields["cost_time"], true) . "'>";
         echo "</td>";
         $rowspan = 4;
         echo "<td rowspan='$rowspan'>" . __('Comments') . "</td>";
@@ -462,15 +489,19 @@ abstract class CommonITILCost extends CommonDBChild
 
         echo "<tr class='tab_bg_1'>";
         echo "<td>" . __('Fixed cost') . "</td><td>";
-        echo "<input type='text' class='form-control' size='15' name='cost_fixed' value='" .
-             Html::formatNumber($this->fields["cost_fixed"], true) . "'>";
+        echo "<input type='text' class='form-control' size='15' name='cost_fixed' 
+            onkeypress='return event.charCode >= 48 && event.charCode <= 57 || event.charCode === 46'
+            value='" .
+            Html::formatNumber($this->fields["cost_fixed"], true) . "'>";
         echo "</td>";
         echo "</tr>";
 
         echo "<tr class='tab_bg_1'>";
         echo "<td>" . __('Material cost') . "</td><td>";
-        echo "<input type='text' class='form-control' size='15' name='cost_material' value='" .
-             Html::formatNumber($this->fields["cost_material"], true) . "'>";
+        echo "<input type='text' class='form-control' size='15' name='cost_material' 
+            onkeypress='return event.charCode >= 48 && event.charCode <= 57 || event.charCode === 46'
+            value='" .
+            Html::formatNumber($this->fields["cost_material"], true) . "'>";
         echo "</td>";
         echo "</tr>";
 

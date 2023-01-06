@@ -2536,20 +2536,44 @@ HTML;
         echo "</tr>";
 
         if (!GLPI_DEMO_MODE) {
-            $sincerand = mt_rand();
+            //$sincerand = mt_rand();
+
+            //DATE FIELDS
+            $randBeginDate = mt_rand();
+            $randEndDate = mt_rand();
+
+            //Controlamos la fecha minima que podrá seleccionar el EndDatefield cuando se
+            //asigna fecha al BeginDatefield
+            $controlMinDate = "
+            const fpEndDate = document.querySelector('#showdate{$randEndDate}')._flatpickr
+            const newENDminDate = new Date(dateStr);
+            newENDminDate.setDate(newENDminDate.getDate() + 1);
+            fpEndDate.config.minDate = newENDminDate;
+            ";
+
+            //Controlamos la fecha máxima que podrá seleccionar el BeginDatefield cuando se
+            //asigna fecha al EndDatefield
+            $controlMaxDate = "
+            const fpBeginDate = document.querySelector('#showdate{$randBeginDate}')._flatpickr
+            const newBEGINmaxDate = new Date(dateStr);
+            fpBeginDate.config.maxDate = newBEGINmaxDate;
+            ";
+
             echo "<tr class='tab_bg_1'>";
-            echo "<td><label for='showdate$sincerand'>" . __('Valid since') . "</label></td><td>";
-            Html::showDateTimeField("begin_date", ['value'       => $this->fields["begin_date"],
-                'rand'        => $sincerand,
-                'maybeempty'  => true
+            echo "<td><label for='showdate$randBeginDate'>" . __('Valid since') . "</label></td><td>";
+             Html::showDateTimeField("begin_date", ['value'       => $this->fields["begin_date"],
+                'rand'        => $randBeginDate,
+                'maybeempty'  => true,
+                'on_change' => $controlMinDate
             ]);
             echo "</td>";
 
-            $untilrand = mt_rand();
-            echo "<td><label for='showdate$untilrand'>" . __('Valid until') . "</label></td><td>";
+            //$untilrand = mt_rand();
+            echo "<td><label for='showdate$randEndDate'>" . __('Valid until') . "</label></td><td>";
             Html::showDateTimeField("end_date", ['value'       => $this->fields["end_date"],
-                'rand'        => $untilrand,
-                'maybeempty'  => true
+                'rand'        => $randEndDate,
+                'maybeempty'  => true,
+                'on_change' => $controlMaxDate
             ]);
             echo "</td></tr>";
         }

@@ -50,7 +50,9 @@ $budget = new Budget();
 if (isset($_POST["add"])) {
     $budget->check(-1, CREATE, $_POST);
 
-    if ($newID = $budget->add($_POST)) {
+    $newID = $budget->add($_POST);
+
+    if ($newID) {
         Event::log(
             $newID,
             "budget",
