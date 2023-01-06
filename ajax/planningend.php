@@ -56,8 +56,8 @@ if (
         'timestep'   => -1,
         'maybeempty' => false,
         'canedit'    => true,
-        'mindate'    => '',
-        'maxdate'    => '',
+        //'mindate'    => '',
+        //'maxdate'    => '',
         'mintime'    => $_POST['global_begin'],
         'maxtime'    => $_POST['global_end']
     ]);

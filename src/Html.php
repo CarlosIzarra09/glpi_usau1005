@@ -336,6 +336,8 @@ class Html
             $number = 0;
         } else if ($number == "-") { // used for not defines value (from Infocom::Amort, p.e.)
             return "-";
+        } else if ($number < 0) {
+            $number = 0;
         }
 
         $number  = doubleval($number);
@@ -2816,9 +2818,9 @@ HTML;
         $p = [
             'value'        => '',
             'defaultDate'  => '',
-            'maybeempty'   => true,
+            'maybeempty'   => false,
             'canedit'      => true,
-            'min'          => '',
+            'min'          => '1990-01-01',
             'max'          => '',
             'showyear'     => false,
             'display'      => true,
@@ -2829,7 +2831,7 @@ HTML;
             'yearrange'    => '',
             'multiple'     => false,
             'size'         => 10,
-            'required'     => false,
+            'required'     => true,
             'placeholder'  => '',
             'on_change'    => '',
         ];
@@ -2991,17 +2993,17 @@ JS;
 
         $p = [
             'value'      => '',
-            'maybeempty' => true,
+            'maybeempty' => false,
             'canedit'    => true,
-            'mindate'    => '',
+            'minDate'    => Date("1990-01-01"),
             'maxdate'    => '',
-            'mintime'    => '',
-            'maxtime'    => '',
+            'mintime'    => '00:00:00',
+            'maxtime'    => '23:59:59',
             'timestep'   => -1,
             'showyear'   => true,
             'display'    => true,
             'rand'       => mt_rand(),
-            'required'   => false,
+            'required'   => true,
             'on_change'  => '',
         ];
 
@@ -3061,12 +3063,12 @@ HTML;
 
         $date_format = Toolbox::getDateFormat('js') . " H:i:S";
 
-        $min_attr = !empty($p['min'])
-         ? "minDate: '{$p['min']}',"
-         : "";
-        $max_attr = !empty($p['max'])
-         ? "maxDate: '{$p['max']}',"
-         : "";
+        $min_attr = !empty($p['minDate'])
+        ? "minDate: '{$p['minDate']}',"
+        : "";
+       $max_attr = !empty($p['maxDate'])
+        ? "maxDate: '{$p['maxDate']}',"
+        : "";
 
         $locale = Locale::parseLocale($_SESSION['glpilanguage']);
         $js = <<<JS
@@ -5610,6 +5612,9 @@ HTML;
                       data-form-data='{\"name\": \"_uploader_" . $p['name'] . "\", \"showfilesize\": \"" . $p['showfilesize'] . "\"}'"
                       . ($p['multiple'] ? " multiple='multiple'" : "")
                       . ($p['onlyimages'] ? " accept='.gif,.png,.jpg,.jpeg'" : "") . ">";
+        
+        
+        $display .= "<span>" . __('Files versioned with dots (e.g., Presentation v1.1, Final Report 10.2) are not valid.') . '</span><br>';
 
         $progressall_js = '';
         if (!$p['only_uploaded_files']) {
