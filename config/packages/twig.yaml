@@ -1,0 +1,7 @@
+# config/packages/twig.yaml
+twig:
+    globals:
+        gg_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
+    form_themes:
+        - 'form/custom_types.html.twig'
+        

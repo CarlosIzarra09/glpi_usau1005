@@ -32,6 +32,7 @@
  #}
 
 {% extends 'layout/page_card_notlogged.html.twig' %}
+{% import 'components/form/custom_types.html.twig' as captcha %}
 
 {% block content_block %}
    <form action="{{ path('front/login.php') }}" method="post" autocomplete="off"  data-submit-once>
@@ -67,6 +68,7 @@
                <label class="form-label">
                   {{ __('Captcha') }}
                </label>
+               {{ captcha.re_captcha_row(1231,'checkbox') }}
             </div>
 
             {% if constant('GLPI_DEMO_MODE') %}
