@@ -39,8 +39,12 @@
 
 use Glpi\Application\View\TemplateRenderer;
 use Glpi\Toolbox\Sanitizer;
+use GLPI\Event;
+use Symfony\Component\HttpFoundation\Request;
+use ReCaptcha\ReCaptcha;
 
 include('../inc/includes.php');
+include('../src/Event.php');
 
 
 if (!isset($_SESSION["glpicookietest"]) || ($_SESSION["glpicookietest"] != 'testcookie')) {
@@ -65,6 +69,16 @@ if (isset($_SESSION['pwdfield']) && isset($_POST[$_SESSION['pwdfield']])) {
 } else {
     $password = '';
 }
+
+//Recaptcha validator "g-recaptcha-response"
+/*if (isset($_SESSION['g-recaptcha-response']) && isset($_POST[$_SESSION['g-recaptcha-response']])) {
+
+    $content = var_export($_SESSION['g-recaptcha-response'], true);
+    Event::log(1, "-", 3, "-", $content);
+    //$password = Sanitizer::unsanitize($_POST[$_SESSION['pwdfield']]);
+} else {
+    //$password = '';
+}*/
 // Manage the selection of the auth source (local, LDAP id, MAIL id)
 if (isset($_POST['auth'])) {
     $login_auth = $_POST['auth'];
@@ -81,6 +95,26 @@ if (isset($_POST['redirect']) && (strlen($_POST['redirect']) > 0)) {
 } else if (isset($_GET['redirect']) && strlen($_GET['redirect']) > 0) {
     $REDIRECT = "?redirect=" . rawurlencode($_GET['redirect']);
 }
+
+
+$content = var_export($_POST['g-recaptcha-response'], true);
+Event::log(1, "-", 3, "-", $content);
+
+$request = Request::createFromGlobals();
+
+$recaptcha = new ReCaptcha('6LemxOwjAAAAAJSMnRWaiEmPf_uVTMR1HUv6KgxJ');
+$errors_captcha = array("Captcha is invalid");
+
+$resp = $recaptcha->verify($request->request->get('g-recaptcha-response'), $request->getClientIp());
+if (!$resp->isSuccess()) {
+    TemplateRenderer::getInstance()->display('pages/login_error.html.twig', [
+        'errors'    => $errors_captcha,
+        'login_url' => $CFG_GLPI["root_doc"] . '/front/logout.php?noAUTO=1' . str_replace("?", "&", $REDIRECT),
+    ]);
+    exit();
+}
+
+
 
 $auth = new Auth();
 

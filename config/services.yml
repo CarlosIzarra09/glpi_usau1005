@@ -1,0 +1,4 @@
+services:
+    ReCaptcha\ReCaptcha:
+        arguments:
+            - '%env(GOOGLE_RECAPTCHA_SECRET_KEY)%'
