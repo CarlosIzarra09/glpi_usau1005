@@ -97,31 +97,32 @@ if (isset($_POST['redirect']) && (strlen($_POST['redirect']) > 0)) {
 }
 
 
-$content = var_export($_POST['g-recaptcha-response'], true);
-Event::log(1, "-", 3, "-", $content);
-
-$request = Request::createFromGlobals();
-
-$recaptcha = new ReCaptcha('6LemxOwjAAAAAJSMnRWaiEmPf_uVTMR1HUv6KgxJ');
-$errors_captcha = array("Captcha is invalid");
-
-$resp = $recaptcha->verify($request->request->get('g-recaptcha-response'), $request->getClientIp());
-if (!$resp->isSuccess()) {
-    TemplateRenderer::getInstance()->display('pages/login_error.html.twig', [
-        'errors'    => $errors_captcha,
-        'login_url' => $CFG_GLPI["root_doc"] . '/front/logout.php?noAUTO=1' . str_replace("?", "&", $REDIRECT),
-    ]);
-    exit();
-}
-
-
+//$content = var_export($_POST['g-recaptcha-response'], true);
+//Event::log(1, "-", 3, "-", $content);
 
 $auth = new Auth();
 
 
 // now we can continue with the process...
 if ($auth->login($login, $password, (isset($_REQUEST["noAUTO"]) ? $_REQUEST["noAUTO"] : false), $remember, $login_auth)) {
-    Auth::redirectIfAuthenticated();
+
+    $request = Request::createFromGlobals();
+
+    $recaptcha = new ReCaptcha('6LemxOwjAAAAAJSMnRWaiEmPf_uVTMR1HUv6KgxJ');
+    $errors_captcha = array("Captcha is invalid");
+
+    $resp = $recaptcha->verify($request->request->get('g-recaptcha-response'), $request->getClientIp());
+    if (!$resp->isSuccess()) {
+    TemplateRenderer::getInstance()->display('pages/login_error.html.twig', [
+        'errors'    => $errors_captcha,
+        'login_url' => $CFG_GLPI["root_doc"] . '/front/logout.php?noAUTO=1' . str_replace("?", "&", $REDIRECT),
+    ]);
+    exit(); }
+    else{
+        Auth::redirectIfAuthenticated();
+    }
+
+    
 } else {
     TemplateRenderer::getInstance()->display('pages/login_error.html.twig', [
         'errors'    => $auth->getErrors(),
@@ -129,3 +130,6 @@ if ($auth->login($login, $password, (isset($_REQUEST["noAUTO"]) ? $_REQUEST["noA
     ]);
     exit();
 }
+
+
+
