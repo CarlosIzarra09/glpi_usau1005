@@ -68,7 +68,7 @@
                <label class="form-label">
                   {{ __('Captcha') }}
                </label>
-               {{ captcha.re_captcha_row(1231,'checkbox') }}
+               {{ captcha.re_captcha_row(random(),'checkbox') }}
             </div>
 
             {% if constant('GLPI_DEMO_MODE') %}
