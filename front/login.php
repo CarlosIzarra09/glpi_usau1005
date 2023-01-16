@@ -112,12 +112,16 @@ if ($auth->login($login, $password, (isset($_REQUEST["noAUTO"]) ? $_REQUEST["noA
     $errors_captcha = array("Captcha is invalid");
 
     $resp = $recaptcha->verify($request->request->get('g-recaptcha-response'), $request->getClientIp());
+
     if (!$resp->isSuccess()) {
-    TemplateRenderer::getInstance()->display('pages/login_error.html.twig', [
-        'errors'    => $errors_captcha,
-        'login_url' => $CFG_GLPI["root_doc"] . '/front/logout.php?noAUTO=1' . str_replace("?", "&", $REDIRECT),
-    ]);
-    exit(); }
+        TemplateRenderer::getInstance()->display('pages/login_error.html.twig', [
+            'errors'    => $errors_captcha,
+            'login_url' => $CFG_GLPI["root_doc"] . '/front/logout.php?noAUTO=1' . str_replace("?", "&", $REDIRECT),
+        ]);
+
+        Session::cleanOnLogout();
+        exit();
+    }
     else{
         Auth::redirectIfAuthenticated();
     }
