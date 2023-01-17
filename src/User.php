@@ -2586,6 +2586,7 @@ HTML;
             [
                 'value' => $this->fields['phone'],
                 'id'    => "textfield_phone$phonerand",
+                'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57"
             ]
         );
         echo "</td>";
@@ -2628,6 +2629,7 @@ HTML;
             [
                 'value' => $this->fields['mobile'],
                 'id'    => "textfield_mobile$mobilerand",
+                'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57"
             ]
         );
         echo "</td>";
@@ -2644,6 +2646,7 @@ HTML;
             [
                 'value' => $this->fields['phone2'],
                 'id'    => "textfield_phone2$phone2rand",
+                'onkeypress' => "return event.charCode >= 48 && event.charCode <= 57"
             ]
         );
         echo "</td>";

@@ -185,10 +185,6 @@ class GLPIUploadHandler extends UploadHandler
                                 $val->error = __('Filetype not allowed');
 
                             }
-
-
-
-
                             
                         }
                     }

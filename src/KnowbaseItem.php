@@ -1027,17 +1027,43 @@ class KnowbaseItem extends CommonDBVisible implements ExtraVisibilityCriteria
             }
         }
 
+        //DATEFIELDS
+        $randBeginDate = mt_rand();
+        $randEndDate = mt_rand();
+
+        //Controlamos la fecha minima que podrá seleccionar el EndDatefield cuando se
+        //asigna fecha al BeginDatefield
+        $controlMinDate = "
+        const fpEndDate = document.querySelector('#showdate{$randEndDate}')._flatpickr
+        const newENDminDate = new Date(dateStr);
+        newENDminDate.setDate(newENDminDate.getDate() + 1);
+        fpEndDate.config.minDate = newENDminDate;
+        ";
+
+        //Controlamos la fecha máxima que podrá seleccionar el BeginDatefield cuando se
+        //asigna fecha al EndDatefield
+        $controlMaxDate = "
+        const fpBeginDate = document.querySelector('#showdate{$randBeginDate}')._flatpickr
+        const newBEGINmaxDate = new Date(dateStr);
+        
+        fpBeginDate.config.maxDate = newBEGINmaxDate;
+        ";
+
         echo "<tr class='tab_bg_1'>";
         echo "<td>" . __('Visible since') . "</td><td>";
         Html::showDateTimeField("begin_date", ['value'       => $this->fields["begin_date"],
             'maybeempty' => true,
-            'canedit'    => $canedit
+            'canedit'    => $canedit,
+            'rand' => $randBeginDate,
+            'on_change' => $controlMinDate
         ]);
         echo "</td>";
         echo "<td>" . __('Visible until') . "</td><td>";
         Html::showDateTimeField("end_date", ['value'       => $this->fields["end_date"],
             'maybeempty' => true,
-            'canedit'    => $canedit
+            'canedit'    => $canedit,
+            'rand' => $randEndDate,
+            'on_change' => $controlMaxDate
         ]);
         echo "</td></tr>";
 

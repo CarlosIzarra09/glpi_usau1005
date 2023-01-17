@@ -196,12 +196,15 @@
                      {% endif %}
 
                      {% if item.isField('registration_number') %}
+                        
                         {{ fields.autoNameField(
                            'registration_number',
                            item,
                            (item_type starts with 'User' ? _x('user', 'Administrative number') : _x('infocom', 'Administrative number')),
                            withtemplate,
-                           field_options
+                           field_options|merge({
+                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57'
+                           })
                         ) }}
                      {% endif %}
 
@@ -211,7 +214,9 @@
                            item,
                            'Phone'|itemtype_name,
                            withtemplate,
-                           field_options
+                           field_options|merge({
+                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57'
+                           })
                         ) }}
                      {% endif %}
 
@@ -221,7 +226,9 @@
                            item,
                            __('Phone 2'),
                            withtemplate,
-                           field_options
+                           field_options|merge({
+                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57'
+                           })
                         ) }}
                      {% endif %}
 
@@ -231,7 +238,9 @@
                            item,
                            'Phone'|itemtype_name,
                            withtemplate,
-                           field_options
+                           field_options|merge({
+                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57'
+                           })
                         ) }}
                      {% endif %}
 
@@ -241,7 +250,9 @@
                            item,
                            __('Mobile phone'),
                            withtemplate,
-                           field_options
+                           field_options|merge({
+                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57'
+                           })
                         ) }}
                      {% endif %}
 
