@@ -163,7 +163,7 @@ class GLPIUploadHandler extends UploadHandler
                             if(file_exists($upload_dir . $val->name)){
                                 unlink($upload_dir . $val->name);
                             }
-                            $val->error = __('Filetype not allowed');
+                            $val->error = __('Filetype with double ext. is not allowed');
                         }else{
 
                             if(!empty(Document::isValidDoc($val->display))){
@@ -183,7 +183,7 @@ class GLPIUploadHandler extends UploadHandler
                                     unlink($upload_dir . $val->name);
                                 }
                                 $val->error = __('Filetype not allowed');
-                                
+
                             }
 
 
