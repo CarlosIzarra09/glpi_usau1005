@@ -166,14 +166,30 @@ class GLPIUploadHandler extends UploadHandler
                             $val->error = __('Filetype not allowed');
                         }else{
 
-                            if (isset($val->size)) {
-                                $val->filesize = Toolbox::getSize($val->size);
-                                if (isset($params['showfilesize']) && $params['showfilesize']) {
-                                    $val->display = sprintf('%1$s %2$s', $val->display, $val->filesize);
+                            if(!empty(Document::isValidDoc($val->display))){
+
+                                if (isset($val->size)) {
+                                    $val->filesize = Toolbox::getSize($val->size);
+                                    if (isset($params['showfilesize']) && $params['showfilesize']) {
+                                        $val->display = sprintf('%1$s %2$s', $val->display, $val->filesize);
+                                    }
                                 }
+    
+                                $val->id = 'doc' . $params['name'] . mt_rand();
+
+                            }else{
+
+                                if(file_exists($upload_dir . $val->name)){
+                                    unlink($upload_dir . $val->name);
+                                }
+                                $val->error = __('Filetype not allowed');
+                                
                             }
 
-                            $val->id = 'doc' . $params['name'] . mt_rand();
+
+
+
+                            
                         }
                     }
                     
