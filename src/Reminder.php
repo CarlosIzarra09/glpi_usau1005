@@ -634,6 +634,29 @@ class Reminder extends CommonDBVisible implements
         echo "</tr>";
 
         if (!isset($options['from_planning_ajax'])) {
+            
+            //DATEFIELDS
+            $randBeginDate = mt_rand();
+            $randEndDate = mt_rand();
+
+            //Controlamos la fecha minima que podrá seleccionar el EndDatefield cuando se
+            //asigna fecha al BeginDatefield
+            $controlMinDate = "
+            const fpEndDate = document.querySelector('#showdate{$randEndDate}')._flatpickr
+            const newENDminDate = new Date(dateStr);
+            newENDminDate.setDate(newENDminDate.getDate() + 1);
+            fpEndDate.config.minDate = newENDminDate;
+            ";
+
+            //Controlamos la fecha máxima que podrá seleccionar el BeginDatefield cuando se
+            //asigna fecha al EndDatefield
+            $controlMaxDate = "
+            const fpBeginDate = document.querySelector('#showdate{$randBeginDate}')._flatpickr
+            const newBEGINmaxDate = new Date(dateStr);
+        
+            fpBeginDate.config.maxDate = newBEGINmaxDate;
+            ";
+
             echo "<tr class='tab_bg_2'>";
             echo "<td>" . __('Visibility') . "</td>";
             echo "<td colspan='2'>";
@@ -643,7 +666,9 @@ class Reminder extends CommonDBVisible implements
                 "begin_view_date",
                 ['value'      => $this->fields["begin_view_date"],
                     'maybeempty' => true,
-                    'canedit'    => $canedit
+                    'canedit'    => $canedit,
+                    'rand' => $randBeginDate,
+                    'on_change' => $controlMinDate
                 ]
             );
             echo '</td><td>' . __('End') . '</td><td>';
@@ -651,7 +676,9 @@ class Reminder extends CommonDBVisible implements
                 "end_view_date",
                 ['value'      => $this->fields["end_view_date"],
                     'maybeempty' => true,
-                    'canedit'    => $canedit
+                    'canedit'    => $canedit,
+                    'rand' => $randEndDate,
+                    'on_change' => $controlMaxDate
                 ]
             );
             echo '</td></tr></table>';
