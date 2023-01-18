@@ -46,6 +46,7 @@ if (!isset($_GET["id"])) {
 
 $ent = new Supplier();
 
+
 if (isset($_POST["add"])) {
     $ent->check(-1, CREATE, $_POST);
 

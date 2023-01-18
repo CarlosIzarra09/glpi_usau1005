@@ -42,7 +42,8 @@
       _x('phone', 'Number'),
       withtemplate,
       params|merge({
-         'onkeypress':'return event.charCode >= 48 && event.charCode <= 57'
+         'onkeypress':'return event.charCode >= 48 && event.charCode <= 57',
+         'maxlength':10
       }
       )
    ) }}
@@ -95,7 +96,8 @@
       __('Account number'),
       withtemplate,
       params|merge({
-         'onkeypress':'return event.charCode >= 48 && event.charCode <= 57'
+         'onkeypress':'return event.charCode >= 48 && event.charCode <= 57',
+         'maxlength':20
       })
    ) }}
 

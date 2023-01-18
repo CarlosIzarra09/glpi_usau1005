@@ -203,7 +203,8 @@
                            (item_type starts with 'User' ? _x('user', 'Administrative number') : _x('infocom', 'Administrative number')),
                            withtemplate,
                            field_options|merge({
-                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57'
+                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57',
+                              'maxlength':10
                            })
                         ) }}
                      {% endif %}
@@ -215,7 +216,8 @@
                            'Phone'|itemtype_name,
                            withtemplate,
                            field_options|merge({
-                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57'
+                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57',
+                              'maxlength':9
                            })
                         ) }}
                      {% endif %}
@@ -227,7 +229,8 @@
                            __('Phone 2'),
                            withtemplate,
                            field_options|merge({
-                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57'
+                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57',
+                              'maxlength':9
                            })
                         ) }}
                      {% endif %}
@@ -239,7 +242,8 @@
                            'Phone'|itemtype_name,
                            withtemplate,
                            field_options|merge({
-                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57'
+                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57',
+                              'maxlength':9
                            })
                         ) }}
                      {% endif %}
@@ -251,7 +255,8 @@
                            __('Mobile phone'),
                            withtemplate,
                            field_options|merge({
-                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57'
+                              'onkeypress':'return event.charCode >= 48 && event.charCode <= 57',
+                              'maxlength':9
                            })
                         ) }}
                      {% endif %}
@@ -317,7 +322,9 @@
                            item,
                            __('Postal code'),
                            withtemplate,
-                           field_options
+                           field_options|merge({
+                              'maxlength':6
+                           })
                         ) }}
                      {% endif %}
 
