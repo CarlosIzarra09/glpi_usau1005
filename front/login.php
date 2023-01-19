@@ -59,6 +59,29 @@ $_POST = array_map('stripslashes', $_POST);
 
 //Do login and checks
 //$user_present = 1;
+$REDIRECT = "";
+// Validate custom captcha
+if (isset($_POST['captcha_entry']) && isset($_SESSION['captcha_string'])) {
+
+    if($_POST['captcha_entry'] !== $_SESSION['captcha_string']){
+
+        $errors_captcha = array("El código captcha es inválido");
+
+        TemplateRenderer::getInstance()->display('pages/login_error.html.twig', [
+            'errors'    => $errors_captcha,
+            'login_url' => $CFG_GLPI["root_doc"] . '/front/logout.php?noAUTO=1' . str_replace("?", "&", $REDIRECT),
+        ]);
+
+        Session::cleanOnLogout();
+        exit();
+    }
+    /*$content_post = var_export($_POST['captcha_entry'], true);
+    $content_session = var_export($_SESSION['captcha_string'], true);
+    Event::log(1, "Captcha post", 3, "Captcha post", $content_post);
+    Event::log(1, "Captcha session", 3, "Captcha session", $content_session);*/
+    //$password = Sanitizer::unsanitize($_POST[$_SESSION['pwdfield']]);
+} 
+
 if (isset($_SESSION['namfield']) && isset($_POST[$_SESSION['namfield']])) {
     $login = $_POST[$_SESSION['namfield']];
 } else {
@@ -70,15 +93,7 @@ if (isset($_SESSION['pwdfield']) && isset($_POST[$_SESSION['pwdfield']])) {
     $password = '';
 }
 
-//Recaptcha validator "g-recaptcha-response"
-/*if (isset($_SESSION['g-recaptcha-response']) && isset($_POST[$_SESSION['g-recaptcha-response']])) {
 
-    $content = var_export($_SESSION['g-recaptcha-response'], true);
-    Event::log(1, "-", 3, "-", $content);
-    //$password = Sanitizer::unsanitize($_POST[$_SESSION['pwdfield']]);
-} else {
-    //$password = '';
-}*/
 // Manage the selection of the auth source (local, LDAP id, MAIL id)
 if (isset($_POST['auth'])) {
     $login_auth = $_POST['auth'];
@@ -89,7 +104,7 @@ if (isset($_POST['auth'])) {
 $remember = isset($_SESSION['rmbfield']) && isset($_POST[$_SESSION['rmbfield']]) && $CFG_GLPI["login_remember_time"];
 
 // Redirect management
-$REDIRECT = "";
+
 if (isset($_POST['redirect']) && (strlen($_POST['redirect']) > 0)) {
     $REDIRECT = "?redirect=" . rawurlencode($_POST['redirect']);
 } else if (isset($_GET['redirect']) && strlen($_GET['redirect']) > 0) {
@@ -106,7 +121,7 @@ $auth = new Auth();
 // now we can continue with the process...
 if ($auth->login($login, $password, (isset($_REQUEST["noAUTO"]) ? $_REQUEST["noAUTO"] : false), $remember, $login_auth)) {
 
-    $request = Request::createFromGlobals();
+    /*$request = Request::createFromGlobals();
 
     $recaptcha = new ReCaptcha('6LemxOwjAAAAAJSMnRWaiEmPf_uVTMR1HUv6KgxJ');
     $errors_captcha = array("Captcha is invalid");
@@ -124,8 +139,8 @@ if ($auth->login($login, $password, (isset($_REQUEST["noAUTO"]) ? $_REQUEST["noA
     }
     else{
         Auth::redirectIfAuthenticated();
-    }
-
+    }*/
+    Auth::redirectIfAuthenticated();
     
 } else {
     TemplateRenderer::getInstance()->display('pages/login_error.html.twig', [

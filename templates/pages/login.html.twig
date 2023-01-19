@@ -47,7 +47,7 @@
             </div>
             <div class="mb-3">
                <label class="form-label">{{ __('Login') }}</label>
-               <input type="text" class="form-control" id="login_name" name="{{ namfield }}" placeholder="" tabindex="1" />
+               <input type="text" class="form-control" id="login_name" required name="{{ namfield }}" placeholder="" tabindex="1" />
             </div>
             <div class="mb-3">
                <label class="form-label">
@@ -61,14 +61,15 @@
                      </span>
                   {% endif %}
                </label>
-               <input type="password" class="form-control" name="{{ pwdfield }}" placeholder="" autocomplete="off" tabindex="2" />
+               <input type="password" class="form-control" required name="{{ pwdfield }}" placeholder="" autocomplete="off" tabindex="2" />
             </div>
 
-            <div class="mb-4">
+            <div class="mb-4 text-center">
                <label class="form-label">
-                  {{ __('Captcha') }}
+                  <img src="data:image/png;base64, {{ captchaImage }} " alt="Captcha" />
                </label>
-               {{ captcha.re_captcha_row(random(),'checkbox') }}
+               <input type="text" class="form-control" required maxlength="6" name="captcha_entry" placeholder="Ingrese el valor de la imagen" autocomplete="off" tabindex="3" />
+               
             </div>
 
             {% if constant('GLPI_DEMO_MODE') %}
