@@ -137,6 +137,9 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
 
     $var_captcha = getImageCaptcha();
     $_SESSION['captcha_string'] = $var_captcha[1];
+
+    $var_reload = getImageCaptcha();
+    $_SESSION['captcha_string'] = $var_reload[1];
     
     TemplateRenderer::getInstance()->display('pages/login.html.twig', [
         'card_bg_width'       => true,
@@ -166,7 +169,9 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
         'auth_dropdown_login' => Auth::dropdownLogin(false),
         'copyright_message'   => Html::getCopyrightMessage(false),
         'errors'              => $errors,
-        'captchaImage'        => $var_captcha[0]
+        'captchaImage'        => $var_captcha[0],
+        'reloadImage'         => $var_reload[0],
+        //'callNewCaptcha'      => getImageCaptcha(),
     ]);
 }
 // call cron
