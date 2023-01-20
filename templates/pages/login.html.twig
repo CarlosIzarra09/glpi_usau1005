@@ -64,15 +64,22 @@
                <input type="password" class="form-control" required name="{{ pwdfield }}" placeholder="" autocomplete="off" tabindex="2" />
             </div>
 
-            <div class="mb-4 text-center">
+            <div class="mb-4">
                <label class="form-label">
-                  <img src="data:image/png;base64, {{ captchaImage }}" alt="Captcha" id="imageCaptcha"/>
-                  
+                  {{ __('Captcha') }}
                </label>
-               <input type="text" class="form-control" required maxlength="6" name="captcha_entry" placeholder="Ingrese el valor de la imagen" autocomplete="off" tabindex="3" />
-               <button type="button" name="reload" id="reloadId" class="btn btn-secondary w-100" >
-                     {{ __('Reload') }}
-               </button>
+
+               <div class="text-center mb-3">
+                  <img src="data:image/png;base64, {{ captchaImage }}" alt="Captcha" id="imageCaptcha"/>
+
+                  <button type="button" name="reload" id="reloadId" class="btn btn-secondary w-20" >
+                     <i class="fas fa-rotate auto-refresh" title="refresh_captcha"></i>
+                  </button>
+               </div>
+               
+               
+               <input type="text" class="form-control" required maxlength="6" name="cptchfield_form" placeholder="Ingrese el valor de la imagen" autocomplete="off" tabindex="3" />
+               
             </div>
 
             {% if constant('GLPI_DEMO_MODE') %}
@@ -153,9 +160,11 @@
       $('#reload').focus();
 
       $("#reloadId").click(function() {
-         let capt = document.querySelector("#imageCaptcha");
-         capt.src = "data:image/png;base64, {{ imageCaptcha }}";
-         console.log('fecha', Date.now());
+         location.reload();
+         
+         //let capt = document.querySelector("#imageCaptcha");
+         //capt.src = "data:image/png;base64";
+         //console.log('fecha', Date.now());
       });
 
    });

@@ -61,9 +61,9 @@ $_POST = array_map('stripslashes', $_POST);
 //$user_present = 1;
 $REDIRECT = "";
 // Validate custom captcha
-if (isset($_POST['captcha_entry']) && isset($_SESSION['captcha_string'])) {
+if (isset($_POST['cptchfield_form']) && isset($_SESSION['cptchfield'])) {
 
-    if($_POST['captcha_entry'] !== $_SESSION['captcha_string']){
+    if($_POST['cptchfield_form'] !== $_SESSION['cptchfield']){
 
         $errors_captcha = array("El código captcha es inválido");
 

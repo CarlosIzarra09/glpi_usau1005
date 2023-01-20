@@ -136,10 +136,10 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
     }
 
     $var_captcha = getImageCaptcha();
-    $_SESSION['captcha_string'] = $var_captcha[1];
+    $_SESSION['cptchfield'] = $var_captcha[1];
 
-    $var_reload = getImageCaptcha();
-    $_SESSION['captcha_string'] = $var_reload[1];
+    //$var_reload = getImageCaptcha();
+    //$_SESSION['captcha_string'] = $var_reload[1];
     
     TemplateRenderer::getInstance()->display('pages/login.html.twig', [
         'card_bg_width'       => true,
@@ -150,7 +150,8 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
         'text_login'          => $CFG_GLPI['text_login'],
         'namfield'            => ($_SESSION['namfield'] = uniqid('fielda')),
         'pwdfield'            => ($_SESSION['pwdfield'] = uniqid('fieldb')),
-        'rmbfield'            => ($_SESSION['rmbfield'] = uniqid('fieldc')),
+        //'cptchfield'          => ($_SESSION['captchafield'] = uniqid('fieldc')),
+        'rmbfield'            => ($_SESSION['rmbfield'] = uniqid('fieldd')),
         'show_lost_password'  => $CFG_GLPI["notifications_mailing"]
                               && countElementsInTable('glpi_notifications', [
                                   'itemtype'  => 'User',
@@ -170,7 +171,7 @@ if (!file_exists(GLPI_CONFIG_DIR . "/config_db.php")) {
         'copyright_message'   => Html::getCopyrightMessage(false),
         'errors'              => $errors,
         'captchaImage'        => $var_captcha[0],
-        'reloadImage'         => $var_reload[0],
+        //'reloadImage'         => $var_reload[0]
         //'callNewCaptcha'      => getImageCaptcha(),
     ]);
 }

@@ -322,45 +322,60 @@ class User extends CommonDBTM
             return false;
         }
 
-        if(!empty(trim($input['registration_number']))){
+        if(isset($input['registration_number'])){
+            if(!empty(trim($input['registration_number']))){
 
-            /*if(strlen($input['registration_number']) > 10){
-                return false;
-            }*/
-            
-            if((float)$input['registration_number'] < 0){
-                $input['registration_number'] = 0;
+                /*if(strlen($input['registration_number']) > 10){
+                    return false;
+                }*/
+                
+                if((float)$input['registration_number'] < 0){
+                    $input['registration_number'] = 0;
+                }
+    
+                $input['registration_number'] = round((float) $input['registration_number']);
             }
-
-            $input['registration_number'] = round((float) $input['registration_number']);
         }
 
-        if(!empty(trim($input['phone']))){
+        if(isset($input['phone'])){
+            if(!empty(trim($input['phone']))){
             
-            if((float)$input['phone'] < 0){
-                $input['phone'] = 0;
+                if((float)$input['phone'] < 0){
+                    $input['phone'] = 0;
+                }
+    
+                $input['phone'] = round((float) $input['phone']);
             }
-
-            $input['phone'] = round((float) $input['phone']);
         }
 
-        if(!empty(trim($input['phone2']))){
-            
-            if((float)$input['phone2'] < 0){
-                $input['phone2'] = 0;
-            }
+        if(isset($input['phone2'])){
 
-            $input['phone2'] = round((float) $input['phone2']);
+            if(!empty(trim($input['phone2']))){
+            
+                if((float)$input['phone2'] < 0){
+                    $input['phone2'] = 0;
+                }
+    
+                $input['phone2'] = round((float) $input['phone2']);
+            }
+        }
+        
+        if(isset($input['mobile'])){
+
+            if(!empty(trim($input['mobile']))){
+            
+                if((float)$input['mobile'] < 0){
+                    $input['mobile'] = 0;
+                }
+    
+                $input['mobile'] = round((float) $input['mobile']);
+            }
+            
         }
 
-        if(!empty(trim($input['mobile']))){
-            
-            if((float)$input['mobile'] < 0){
-                $input['mobile'] = 0;
-            }
+        
 
-            $input['mobile'] = round((float) $input['mobile']);
-        }
+        
         
        // Store input in the object to be available in all sub-method / hook
         $this->input = $input;

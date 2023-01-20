@@ -26,7 +26,6 @@
         "donatj/phpuseragentparser": "^1.7",
         "elvanto/litemoji": "^4.1",
         "glpi-project/inventory_format": "^1.1",
-        "google/recaptcha": "^1.2",
         "guzzlehttp/guzzle": "^7.5",
         "guzzlehttp/psr7": "^2.4",
         "html2text/html2text": "^4.3",
@@ -57,6 +56,7 @@
         "symfony/cache": "^5.4",
         "symfony/console": "^5.4",
         "symfony/css-selector": "^5.4",
+        "symfony/dependency-injection": "^5.4",
         "symfony/dom-crawler": "^5.4",
         "symfony/form": "^5.4",
         "symfony/http-foundation": "^5.4",
@@ -66,6 +66,7 @@
         "symfony/polyfill-php80": "^1.26",
         "symfony/polyfill-php81": "^1.26",
         "symfony/polyfill-php82": "^1.26",
+        "symfony/runtime": "^5.4",
         "tecnickcom/tcpdf": "^6.5",
         "true/punycode": "^2.1",
         "twig/string-extra": "^3.3",
@@ -101,7 +102,10 @@
         "platform": {
             "php": "7.4.0"
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "symfony/runtime": true
+        }
     },
     "autoload": {
         "psr-4": {
