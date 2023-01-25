@@ -71,7 +71,29 @@ if (isset($_UPOST['_actors'])) {
 if (isset($_POST["add"])) {
     $track->check(-1, CREATE, $_POST);
 
-    if ($track->add($_POST)) {
+    $sleepSeconds = 10;
+    $msg_redirect = "Muchos tickets creados seguidos, se aplicó una penalidad de 10 segundos";
+    //$sessionId = $_SESSION['valid_id'];
+    $_SESSION['action_create_tickets'] = $_SESSION['action_create_tickets'] + 1;
+
+    if($_SESSION['action_create_tickets'] > 10){
+
+        if($_SESSION['count_create_tickets'] === 2){
+            $_SESSION['count_create_tickets'] = 0;
+            $sleepSeconds = 60;
+            $msg_redirect = "Excede un comportamiento normal, se aplicó una penalidad de 60 segundos";
+        }
+        $_SESSION['count_create_tickets'] = $_SESSION['count_create_tickets'] + 1;
+        sleep($sleepSeconds);
+        $_SESSION['action_create_tickets'] = 0;
+        Session::addMessageAfterRedirect($msg_redirect);
+        Html::back();                
+    }else{
+        $itemAdded = $track->add($_POST);
+    }
+
+    
+    if ($itemAdded) {
         if ($_SESSION['glpibackcreated']) {
             Html::redirect($track->getLinkURL());
         }

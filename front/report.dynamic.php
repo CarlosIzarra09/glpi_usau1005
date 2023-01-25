@@ -120,6 +120,44 @@ if (isset($_GET["item_type"]) && isset($_GET["display_type"])) {
                 }
             }
             $params = Search::manageParams($_GET["item_type"], $_GET);
-            Search::showList($_GET["item_type"], $params);
+
+            //$_SESSION['status_downl_tickets'] = 0;
+
+            if($_SESSION['status_downl_tickets'] === 1 || 
+            $_SESSION['status_downl_tickets'] === 2 ){
+
+                $_SESSION['status_downl_tickets'] = 1;
+
+                $sleepSeconds = 10;
+                $msg_redirect = "Muchas descargas seguidas, se aplicó una penalidad de 10 segundos";
+                //$sessionId = $_SESSION['valid_id'];
+                $_SESSION['action_downl_tickets'] = $_SESSION['action_downl_tickets'] + 1;
+    
+                if($_SESSION['action_downl_tickets'] > 10){
+    
+                    if($_SESSION['count_downl_tickets'] === 3){
+                        $_SESSION['count_downl_tickets'] = 0;
+                        $sleepSeconds = 60;
+                        $msg_redirect = "Excede un comportamiento normal, se aplicó una penalidad de 60 segundos";
+                    }
+                    $_SESSION['count_downl_tickets'] = $_SESSION['count_downl_tickets'] + 1;
+                    sleep($sleepSeconds);
+                    $_SESSION['action_downl_tickets'] = 0;
+                    Session::addMessageAfterRedirect($msg_redirect);
+                    Html::back();                
+                }else{
+                    //sleep(3);
+                    Search::showList($_GET["item_type"], $params);
+                    $_SESSION['status_downl_tickets'] = 2;
+                }
+            }else{
+                Html::back();
+                //$_SESSION['status_downl_tickets'] = 1;
+            }
+            
+            
+
+            
+            
     }
 }
