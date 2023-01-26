@@ -70,30 +70,116 @@ if (isset($_UPOST['_actors'])) {
 
 if (isset($_POST["add"])) {
     $track->check(-1, CREATE, $_POST);
+    //$itemAdded = $track->add($_POST);
 
-    $sleepSeconds = 10;
-    $msg_redirect = "Muchos tickets creados seguidos, se aplicó una penalidad de 10 segundos";
+    $name = GLPI_LOG_DIR . '/event_add_item.log';
+    $fp   = fopen($name, 'r');
+    $registry_tickets = [];
+
+    while(!feof($fp)) {
+        
+        // Display each line
+        $line = fgets($fp);
+
+        if(strstr($line,'ticket.form')){
+            $a = strpos($line, ':',2);
+            $session_id = substr($line, $a + 1, $a + 27);
+            $b = strpos($line,':',3);
+            $datetime = substr($line,$b+1,$b+27);
+
+            if($_SESSION['valid_id'] === $session_id && date('Y-m-d') === substr($datetime,0,10)){
+                $registry_tickets = [
+                    'session_id' => $session_id,
+                    'datetime' => $datetime,
+                ];
+            }
+        }
+        
+    }
+
+    fclose($fp);
+
+    $lenght_array = count($registry_tickets);
+
+    if($lenght_array > 2){
+        $time1 = strtotime($registry_tickets[$lenght_array - 1]['time']);
+        $time2 = strtotime($registry_tickets[$lenght_array - 2]['time']);
+        $time3 = strtotime($registry_tickets[$lenght_array - 3]['time']);
+
+        if(!($time1 - $time2 === 0) && !($time1 - $time3 === 0)){
+            $itemAdded = $track->add($_POST);
+        }else{
+            Session::cleanOnLogout();
+            Html::redirectToLogin();
+        }
+
+    }else{
+        $itemAdded = $track->add($_POST);
+    }
+    
+
+
+
+    /*foreach ($registry_tickets as $item) {
+        $item['date'];
+
+
+
+    }*
+
+
+    /*$sleepSeconds = 3;
+    $msg_redirect = "Ticket registrado. Muchos tickets creados seguidos, se aplicó una penalidad de 3 segundos";
     //$sessionId = $_SESSION['valid_id'];
     $_SESSION['action_create_tickets'] = $_SESSION['action_create_tickets'] + 1;
 
     if($_SESSION['action_create_tickets'] > 10){
 
-        if($_SESSION['count_create_tickets'] === 2){
-            $_SESSION['count_create_tickets'] = 0;
-            $sleepSeconds = 60;
-            $msg_redirect = "Excede un comportamiento normal, se aplicó una penalidad de 60 segundos";
-        }
         $_SESSION['count_create_tickets'] = $_SESSION['count_create_tickets'] + 1;
-        sleep($sleepSeconds);
-        $_SESSION['action_create_tickets'] = 0;
-        Session::addMessageAfterRedirect($msg_redirect);
-        Html::back();                
+
+        if($_SESSION['count_create_tickets'] === 3){
+            $_SESSION['count_create_tickets'] = 0;
+            //$sleepSeconds = 60;
+            //$msg_redirect = "30 tickets creados en total, excedió un comportamiento normal, se cerró su sesión";
+            //Session::addMessageAfterRedirect($msg_redirect);
+            Session::cleanOnLogout();
+            Html::redirectToLogin();
+            //Html::back();
+            //exit();
+        }else{
+            if($_SESSION['count_create_tickets'] === 2){
+                $msg_redirect = "Ticket registrado. Se aplicó una penalidad de 3 segundos. 10 tickets más y se cerrará su sesión";
+            }
+
+            sleep($sleepSeconds);
+            $_SESSION['action_create_tickets'] = 0;
+            Session::addMessageAfterRedirect($msg_redirect);
+            Html::back();
+        }
+                    
     }else{
         $itemAdded = $track->add($_POST);
-    }
+    }*/
 
     
     if ($itemAdded) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+        Toolbox::logInFile(
+            'event_add_item',
+            sprintf(
+                __('%1$s: %2$s'),
+                basename(__FILE__,'.php'),
+                sprintf(
+                    __('Ticket of session ID:%s created at DATETIME:%s') . "\n",
+                    $_SESSION['valid_id'],
+                    $currentDatetime->format("Y-m-d H:i:s.u")
+                )
+            )
+        );
+
+
+
         if ($_SESSION['glpibackcreated']) {
             Html::redirect($track->getLinkURL());
         }

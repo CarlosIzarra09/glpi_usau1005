@@ -123,28 +123,38 @@ if (isset($_GET["item_type"]) && isset($_GET["display_type"])) {
 
             //$_SESSION['status_downl_tickets'] = 0;
 
-            if($_SESSION['status_downl_tickets'] === 1 || 
+            /*if($_SESSION['status_downl_tickets'] === 1 || 
             $_SESSION['status_downl_tickets'] === 2 ){
 
                 $_SESSION['status_downl_tickets'] = 1;
 
-                $sleepSeconds = 10;
-                $msg_redirect = "Muchas descargas seguidas, se aplicó una penalidad de 10 segundos";
+                $sleepSeconds = 3;
+                $msg_redirect = "Muchas descargas seguidas, se aplicó una penalidad de 3 segundos";
                 //$sessionId = $_SESSION['valid_id'];
                 $_SESSION['action_downl_tickets'] = $_SESSION['action_downl_tickets'] + 1;
     
                 if($_SESSION['action_downl_tickets'] > 10){
     
+                    $_SESSION['count_downl_tickets'] = $_SESSION['count_downl_tickets'] + 1;
+
                     if($_SESSION['count_downl_tickets'] === 3){
                         $_SESSION['count_downl_tickets'] = 0;
-                        $sleepSeconds = 60;
-                        $msg_redirect = "Excede un comportamiento normal, se aplicó una penalidad de 60 segundos";
+                        //$sleepSeconds = 60;
+                        //$msg_redirect = "Excede un comportamiento normal, se aplicó una penalidad de 60 segundos";
+                        Session::cleanOnLogout();
+                        Html::redirectToLogin();
+                    }else{
+
+                        if($_SESSION['count_downl_tickets'] === 2){
+                            $msg_redirect = "10 descargas más y se cerrará su sesión, comportamiento anormal detectado.";
+                        }
+                        sleep($sleepSeconds);
+                        $_SESSION['action_downl_tickets'] = 0;
+                        Session::addMessageAfterRedirect($msg_redirect);
+                        Html::back();      
                     }
-                    $_SESSION['count_downl_tickets'] = $_SESSION['count_downl_tickets'] + 1;
-                    sleep($sleepSeconds);
-                    $_SESSION['action_downl_tickets'] = 0;
-                    Session::addMessageAfterRedirect($msg_redirect);
-                    Html::back();                
+                    
+                              
                 }else{
                     //sleep(3);
                     Search::showList($_GET["item_type"], $params);
@@ -153,8 +163,8 @@ if (isset($_GET["item_type"]) && isset($_GET["display_type"])) {
             }else{
                 Html::back();
                 //$_SESSION['status_downl_tickets'] = 1;
-            }
-            
+            }*/
+            Search::showList($_GET["item_type"], $params);
             
 
             
