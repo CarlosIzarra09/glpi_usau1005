@@ -39,6 +39,7 @@ use Glpi\Event;
 use Glpi\Plugin\Hooks;
 use Glpi\Toolbox\Sanitizer;
 
+ 
 /**
  * Session Class
  **/
@@ -78,6 +79,7 @@ class Session
     public static function init(Auth $auth)
     {
         global $CFG_GLPI;
+        
 
         if ($auth->auth_succeded) {
            // Restart GLPI session : complete destroy to prevent lost datas
@@ -96,13 +98,16 @@ class Session
             $_SESSION = $save;
             $_SESSION['valid_id'] = session_id();
             //mi autoria
-            $_SESSION['status_downl_tickets'] = 1;//0 NO, 1 Descargando, 2 descargado
+            /*$_SESSION['status_downl_tickets'] = 1;//0 NO, 1 Descargando, 2 descargado
             $_SESSION['action_downl_tickets'] = 0;
             $_SESSION['count_downl_tickets'] = 0;
 
             
             $_SESSION['action_create_ticket'] = 0;
-            $_SESSION['count_create_tickets'] = 0;
+            $_SESSION['count_create_tickets'] = 0;*/
+            
+            
+            
              
            // Define default time :
             $_SESSION["glpi_currenttime"] = date("Y-m-d H:i:s");

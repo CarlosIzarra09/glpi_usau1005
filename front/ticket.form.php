@@ -72,6 +72,8 @@ if (isset($_POST["add"])) {
     $track->check(-1, CREATE, $_POST);
     //$itemAdded = $track->add($_POST);
 
+
+    /*
     $name = GLPI_LOG_DIR . '/event_add_item.log';
     $fp   = fopen($name, 'r');
     $registry_tickets = [];
@@ -115,8 +117,28 @@ if (isset($_POST["add"])) {
 
     }else{
         $itemAdded = $track->add($_POST);
+    }*/
+    //$registry_tickets_stack = $GLOBALS['registry_tickets_stack'];
+
+    $itemAdded = false;
+
+    if($registry_tickets_stack->count() === 3){
+        $time1 = strtotime($registry_tickets_stack->current());
+        $registry_tickets_stack->next();
+        $time2 = strtotime($registry_tickets_stack->current());
+        $registry_tickets_stack->next();
+        $time3 = strtotime($registry_tickets_stack->current());
+        $registry_tickets_stack->rewind();
+
+        if(!($time1 - $time2 === 0) && !($time1 - $time3 === 0)){
+            $itemAdded = $track->add($_POST);
+        }else{
+            Session::cleanOnLogout();
+            Html::redirectToLogin();
+        }
+    }else{
+        $itemAdded = $track->add($_POST);
     }
-    
 
 
 
@@ -165,7 +187,7 @@ if (isset($_POST["add"])) {
     if ($itemAdded) {
 
         $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
-        Toolbox::logInFile(
+        /*Toolbox::logInFile(
             'event_add_item',
             sprintf(
                 __('%1$s: %2$s'),
@@ -176,9 +198,27 @@ if (isset($_POST["add"])) {
                     $currentDatetime->format("Y-m-d H:i:s.u")
                 )
             )
+        );*/
+        if($registry_tickets_stack->count() === 3){
+            $registry_tickets_stack->dequeue();
+        }
+        $registry_tickets_stack->enqueue($currentDatetime->format("Y-m-d H:i:s.u"));
+        
+
+        Toolbox::logInFile(
+            'event_add_item',
+            sprintf(
+                __('%1$s: %2$s'),
+                basename(__FILE__,'.php'),
+                sprintf(
+                    __('Elementos en la cola %s, insertado %s') . "\n",
+                    $registry_tickets_stack->count(),
+                    $registry_tickets_stack->current()
+                )
+            )
         );
-
-
+        
+        
 
         if ($_SESSION['glpibackcreated']) {
             Html::redirect($track->getLinkURL());

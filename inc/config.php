@@ -42,6 +42,9 @@ use Glpi\Cache\CacheManager;
 use Glpi\System\RequirementsManager;
 use Glpi\Toolbox\VersionParser;
 
+global $registry_tickets_stack;
+$registry_tickets_stack = new SplQueue();
+
 // Be sure to use global objects if this file is included outside normal process
 global $CFG_GLPI, $GLPI, $GLPI_CACHE;
 
