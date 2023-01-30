@@ -39,7 +39,7 @@ use Glpi\Event;
 use Glpi\Plugin\Hooks;
 use Glpi\Toolbox\Sanitizer;
 
- 
+include('ControlQueues.php');
 /**
  * Session Class
  **/
@@ -105,7 +105,8 @@ class Session
             
             $_SESSION['action_create_ticket'] = 0;
             $_SESSION['count_create_tickets'] = 0;*/
-            
+            $ctrlQueueTicket = ControlQueuesTickets::getInstance();
+            $_SESSION['control_queues_tickets'] = serialize($ctrlQueueTicket);
             
             
              

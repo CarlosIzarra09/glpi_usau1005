@@ -35,7 +35,9 @@
 
 use Glpi\Event;
 
+
 include('../inc/includes.php');
+//include('../src/ControlQueues.php');
 
 Session::checkLoginUser();
 $track = new Ticket();
@@ -49,6 +51,8 @@ $date_fields = [
     'due_date',
     'time_to_own'
 ];
+
+
 
 foreach ($date_fields as $date_field) {
    //handle not clean dates...
@@ -70,8 +74,11 @@ if (isset($_UPOST['_actors'])) {
 
 if (isset($_POST["add"])) {
     $track->check(-1, CREATE, $_POST);
+    //$registry_tickets = $ctrlQueueTicket->getRegistryTickets();
+    $ctrlQueueTicket = unserialize($_SESSION['control_queues_tickets']);
+    $registry_tickets = $ctrlQueueTicket->getRegistryTickets();
     //$itemAdded = $track->add($_POST);
-
+    //$registry_tickets_stack = ControlQueuesTickets::getRegistryTickets();
 
     /*
     $name = GLPI_LOG_DIR . '/event_add_item.log';
@@ -121,24 +128,44 @@ if (isset($_POST["add"])) {
     //$registry_tickets_stack = $GLOBALS['registry_tickets_stack'];
 
     $itemAdded = false;
+   
+    if($registry_tickets->count() === 3){
+        $registry_tickets->rewind();
+        $time1 = strtotime($registry_tickets->current());
+        $registry_tickets->next();
+        $time2 = strtotime($registry_tickets->current());
+        $registry_tickets->next();
+        $time3 = strtotime($registry_tickets->current());
+        
 
-    if($registry_tickets_stack->count() === 3){
-        $time1 = strtotime($registry_tickets_stack->current());
-        $registry_tickets_stack->next();
-        $time2 = strtotime($registry_tickets_stack->current());
-        $registry_tickets_stack->next();
-        $time3 = strtotime($registry_tickets_stack->current());
-        $registry_tickets_stack->rewind();
+        Toolbox::logInFile(
+            'diferencia_seg',
+            sprintf(
+                __('%1$s: %2$s'),
+                basename(__FILE__,'.php'),
+                sprintf(
+                    __('Tiempo 2 - Tiempo 1: %s segundos, Tiempo 3 - Tiempo 1: %s') . "\n",
+                    $time2 - $time1,
+                    $time3 - $time1
+                )
+            )
+        );
 
-        if(!($time1 - $time2 === 0) && !($time1 - $time3 === 0)){
-            $itemAdded = $track->add($_POST);
-        }else{
+        
+        if((
+            ($time2 - $time1 === 0) && ($time3 - $time1 === 0))
+            || ($time3 - $time2 === 0)
+            ){
             Session::cleanOnLogout();
             Html::redirectToLogin();
+        }else{
+            $itemAdded = $track->add($_POST);
         }
+
     }else{
         $itemAdded = $track->add($_POST);
     }
+
 
 
 
@@ -199,10 +226,10 @@ if (isset($_POST["add"])) {
                 )
             )
         );*/
-        if($registry_tickets_stack->count() === 3){
-            $registry_tickets_stack->dequeue();
+        if($registry_tickets->count() === 3){
+            $ctrlQueueTicket->popTopRegistryTicket();
         }
-        $registry_tickets_stack->enqueue($currentDatetime->format("Y-m-d H:i:s.u"));
+        $ctrlQueueTicket->addRegistryTicket($currentDatetime->format("Y-m-d H:i:s.u"));
         
 
         Toolbox::logInFile(
@@ -211,12 +238,14 @@ if (isset($_POST["add"])) {
                 __('%1$s: %2$s'),
                 basename(__FILE__,'.php'),
                 sprintf(
-                    __('Elementos en la cola %s, insertado %s') . "\n",
-                    $registry_tickets_stack->count(),
-                    $registry_tickets_stack->current()
+                    __('Elementos en la cola: %s, insertado %s') . "\n",
+                    $registry_tickets->count(),
+                    $currentDatetime->format("Y-m-d H:i:s.u")
                 )
             )
         );
+
+        $_SESSION['control_queues_tickets'] = serialize($ctrlQueueTicket);
         
         
 
