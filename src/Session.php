@@ -67,6 +67,21 @@ class Session
        // write_close may cause troubles (no login / back to login page)
     }
 
+    
+    /**
+     * Init instances of queues
+     * @return void
+     */
+    public static function initControlQueues(){
+        $ctrlQueueAddTicket = ControlQueueTicket::getInstance();
+        $_SESSION['control_queue_tickets'] = serialize($ctrlQueueAddTicket);
+
+        $ctrlQueueAddProblem = ControlQueueProblem::getInstance();
+        $_SESSION['control_queue_problems'] = serialize($ctrlQueueAddProblem);
+
+        $ctrlQueueAddChange = ControlQueueChange::getInstance();
+        $_SESSION['control_queue_changes'] = serialize($ctrlQueueAddChange);
+    }
 
 
     /**
@@ -105,10 +120,11 @@ class Session
             
             $_SESSION['action_create_ticket'] = 0;
             $_SESSION['count_create_tickets'] = 0;*/
-            $ctrlQueueTicket = ControlQueuesTickets::getInstance();
-            $_SESSION['control_queues_tickets'] = serialize($ctrlQueueTicket);
-            
-            
+            //$ctrlQueueTicket = ControlQueuesTickets::getInstance();
+            //$_SESSION['control_queues_tickets'] = serialize($ctrlQueueTicket);
+
+            // Init control queues
+            self::initControlQueues();
              
            // Define default time :
             $_SESSION["glpi_currenttime"] = date("Y-m-d H:i:s");
