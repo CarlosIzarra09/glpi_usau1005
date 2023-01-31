@@ -74,9 +74,9 @@ if (isset($_UPOST['_actors'])) {
 
 if (isset($_POST["add"])) {
     $track->check(-1, CREATE, $_POST);
-    //$registry_tickets = $ctrlQueueTicket->getRegistryTickets();
-    $ctrlQueueTicket = unserialize($_SESSION['control_queues_tickets']);
-    $registry_tickets = $ctrlQueueTicket->getRegistryTickets();
+    //$registry_tickets = $ctrlQueueAddTicket->getRegistryTickets();
+    $ctrlQueueAddTicket = unserialize($_SESSION['control_queue_tickets']);
+    $registry_tickets = $ctrlQueueAddTicket->getRegistryQueue();
     //$itemAdded = $track->add($_POST);
     //$registry_tickets_stack = ControlQueuesTickets::getRegistryTickets();
 
@@ -138,7 +138,7 @@ if (isset($_POST["add"])) {
         $time3 = strtotime($registry_tickets->current());
         
 
-        Toolbox::logInFile(
+        /*Toolbox::logInFile(
             'diferencia_seg',
             sprintf(
                 __('%1$s: %2$s'),
@@ -149,7 +149,7 @@ if (isset($_POST["add"])) {
                     $time3 - $time1
                 )
             )
-        );
+        );*/
 
         
         if((
@@ -179,8 +179,8 @@ if (isset($_POST["add"])) {
 
     /*$sleepSeconds = 3;
     $msg_redirect = "Ticket registrado. Muchos tickets creados seguidos, se aplicó una penalidad de 3 segundos";
-    //$sessionId = $_SESSION['valid_id'];
-    $_SESSION['action_create_tickets'] = $_SESSION['action_create_tickets'] + 1;
+    $sessionId = $_SESSION['valid_id'];
+    //$_SESSION['action_create_tickets'] = $_SESSION['action_create_tickets'] + 1;
 
     if($_SESSION['action_create_tickets'] > 10){
 
@@ -227,12 +227,12 @@ if (isset($_POST["add"])) {
             )
         );*/
         if($registry_tickets->count() === 3){
-            $ctrlQueueTicket->popTopRegistryTicket();
+            $ctrlQueueAddTicket->popTopRegistryItem();
         }
-        $ctrlQueueTicket->addRegistryTicket($currentDatetime->format("Y-m-d H:i:s.u"));
+        $ctrlQueueAddTicket->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
         
 
-        Toolbox::logInFile(
+        /*Toolbox::logInFile(
             'event_add_item',
             sprintf(
                 __('%1$s: %2$s'),
@@ -243,9 +243,9 @@ if (isset($_POST["add"])) {
                     $currentDatetime->format("Y-m-d H:i:s.u")
                 )
             )
-        );
+        );*/
 
-        $_SESSION['control_queues_tickets'] = serialize($ctrlQueueTicket);
+        $_SESSION['control_queue_tickets'] = serialize($ctrlQueueAddTicket);
         
         
 

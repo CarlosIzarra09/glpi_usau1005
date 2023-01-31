@@ -53,7 +53,46 @@ $problem = new Problem();
 if (isset($_POST["add"])) {
     $problem->check(-1, CREATE, $_POST);
 
-    if ($newID = $problem->add($_POST)) {
+    $ctrlQueueAddProblem = unserialize($_SESSION['control_queue_problems']);
+    $registry_problems = $ctrlQueueAddProblem->getRegistryQueue();
+
+    $newID = false;
+   
+    if($registry_problems->count() === 3){
+        $registry_problems->rewind();
+        $time1 = strtotime($registry_problems->current());
+        $registry_problems->next();
+        $time2 = strtotime($registry_problems->current());
+        $registry_problems->next();
+        $time3 = strtotime($registry_problems->current());
+                
+        if((
+            ($time2 - $time1 === 0) && ($time3 - $time1 === 0))
+            || ($time3 - $time2 === 0)
+            ){
+            Session::cleanOnLogout();
+            Html::redirectToLogin();
+        }else{
+            $newID = $problem->add($_POST);
+        }
+
+    }else{
+        $newID = $problem->add($_POST);
+    }
+
+
+
+    if ($newID) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+    
+        if($registry_problems->count() === 3){
+            $ctrlQueueAddProblem->popTopRegistryItem();
+        }
+        $ctrlQueueAddProblem->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+        
+        $_SESSION['control_queue_problems'] = serialize($ctrlQueueAddProblem);
+
         Event::log(
             $newID,
             "problem",

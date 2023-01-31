@@ -53,15 +53,57 @@ $change = new Change();
 if (isset($_POST["add"])) {
     $change->check(-1, CREATE, $_POST);
 
-    $newID = $change->add($_POST);
-    Event::log(
-        $newID,
-        "change",
-        4,
-        "maintain",
-        //TRANS: %1$s is the user login, %2$s is the name of the item
-        sprintf(__('%1$s adds the item %2$s'), $_SESSION["glpiname"], $_POST["name"])
-    );
+    $ctrlQueueAddChange = unserialize($_SESSION['control_queue_changes']);
+    $registry_changes = $ctrlQueueAddChange->getRegistryQueue();
+
+    $newID = false;
+   
+    if($registry_changes->count() === 3){
+        $registry_changes->rewind();
+        $time1 = strtotime($registry_changes->current());
+        $registry_changes->next();
+        $time2 = strtotime($registry_changes->current());
+        $registry_changes->next();
+        $time3 = strtotime($registry_changes->current());
+                
+        if((
+            ($time2 - $time1 === 0) && ($time3 - $time1 === 0))
+            || ($time3 - $time2 === 0)
+            ){
+            Session::cleanOnLogout();
+            Html::redirectToLogin();
+        }else{
+            $newID = $change->add($_POST);
+        }
+
+    }else{
+        $newID = $change->add($_POST);
+    }
+
+    if($newID){
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+    
+        if($registry_changes->count() === 3){
+            $ctrlQueueAddChange->popTopRegistryItem();
+        }
+        $ctrlQueueAddChange->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+        
+        $_SESSION['control_queue_changes'] = serialize($ctrlQueueAddChange);
+
+        Event::log(
+            $newID,
+            "change",
+            4,
+            "maintain",
+            //TRANS: %1$s is the user login, %2$s is the name of the item
+            sprintf(__('%1$s adds the item %2$s'), $_SESSION["glpiname"], $_POST["name"])
+        );
+    }
+
+
+
+    //no lo pongo dentro del if anterior porque ya vino asi
     if ($_SESSION['glpibackcreated']) {
         Html::redirect($change->getLinkURL());
     } else {
