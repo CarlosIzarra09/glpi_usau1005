@@ -59,7 +59,46 @@ if (isset($_POST["id"])) {
 if (isset($_POST["add"])) {
     $dropdown->check(-1, CREATE, $_POST);
 
-    if ($newID = $dropdown->add($_POST)) {
+    $ctrlQueueTicketRec = unserialize($_SESSION['control_queue_ticketrecurrents']);
+    $registry_ticketrecs = $ctrlQueueTicketRec->getRegistryQueue();
+
+    $newID = false;
+
+    if($registry_ticketrecs->count() === 3){
+        $registry_ticketrecs->rewind();
+        $time1 = strtotime($registry_ticketrecs->current());
+        $registry_ticketrecs->next();
+        $time2 = strtotime($registry_ticketrecs->current());
+        $registry_ticketrecs->next();
+        $time3 = strtotime($registry_ticketrecs->current());
+                
+        if((
+            ($time2 - $time1 === 0) && ($time3 - $time1 === 0))
+            || ($time3 - $time2 === 0)
+            ){
+            Session::cleanOnLogout();
+            Html::redirectToLogin();
+        }else{
+            $newID = $dropdown->add($_POST);
+        }
+
+    }else{
+        $newID = $dropdown->add($_POST);
+    }
+
+
+    if ($newID) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+    
+        if($registry_ticketrecs->count() === 3){
+            $ctrlQueueTicketRec->popTopRegistryItem();
+        }
+        $ctrlQueueTicketRec->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+        
+        $_SESSION['control_queue_ticketrecurrents'] = serialize($ctrlQueueTicketRec);
+
+
         if ($dropdown instanceof CommonDevice) {
             Event::log(
                 $newID,

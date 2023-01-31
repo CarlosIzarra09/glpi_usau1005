@@ -81,6 +81,9 @@ class Session
 
         $ctrlQueueAddChange = ControlQueueChange::getInstance();
         $_SESSION['control_queue_changes'] = serialize($ctrlQueueAddChange);
+
+        $ctrlQueueTicketRec = ControlQueueTicketRec::getInstance();
+        $_SESSION['control_queue_ticketrecurrents'] = serialize($ctrlQueueTicketRec);
     }
 
 

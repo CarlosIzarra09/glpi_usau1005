@@ -45,6 +45,10 @@ Class ControlQueueChange extends ControlQueue{
 
 }
 
+Class ControlQueueTicketRec extends ControlQueue{
+    
+}
+
 
 
 
