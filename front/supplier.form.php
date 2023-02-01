@@ -50,7 +50,30 @@ $ent = new Supplier();
 if (isset($_POST["add"])) {
     $ent->check(-1, CREATE, $_POST);
 
-    if ($newID = $ent->add($_POST)) {
+    $ctrlQueueAddSupplier = unserialize($_SESSION['control_queue_suppliers']);
+    $registry_suppliers = $ctrlQueueAddSupplier->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAddSupplier->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $ent->add($_POST);
+    }
+
+    if ($newID) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+       
+        if($registry_suppliers->count() === 3){
+            $ctrlQueueAddSupplier->popTopRegistryItem();
+        }
+        $ctrlQueueAddSupplier->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+    
+        $_SESSION['control_queue_suppliers'] = serialize($ctrlQueueAddSupplier);
+
+        
         Event::log(
             $newID,
             "suppliers",

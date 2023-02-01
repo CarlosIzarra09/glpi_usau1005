@@ -54,7 +54,29 @@ if (isset($_GET['getvcard'])) {
 } else if (isset($_POST["add"])) {
     $contact->check(-1, CREATE, $_POST);
 
-    if ($newID = $contact->add($_POST)) {
+    $ctrlQueueAddContact = unserialize($_SESSION['control_queue_contacts']);
+    $registry_contacts = $ctrlQueueAddContact->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAddContact->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $contact->add($_POST);
+    }
+
+    if ($newID) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+       
+        if($registry_contacts->count() === 3){
+            $ctrlQueueAddContact->popTopRegistryItem();
+        }
+        $ctrlQueueAddContact->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+    
+        $_SESSION['control_queue_contacts'] = serialize($ctrlQueueAddContact);
+
         Event::log(
             $newID,
             "contacts",

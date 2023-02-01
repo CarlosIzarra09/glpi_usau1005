@@ -131,6 +131,22 @@ class Session
 
         $ctrlQueueDevSimcard = new ControlQueue();
         $_SESSION['control_queue_devsimcard'] = serialize($ctrlQueueDevSimcard);
+
+        //Managment
+        $ctrlQueueLicense = new ControlQueue();
+        $_SESSION['control_queue_licenses'] = serialize($ctrlQueueLicense);
+
+        $ctrlQueueBudgets = new ControlQueue();
+        $_SESSION['control_queue_budgets'] = serialize($ctrlQueueBudgets);
+
+        $ctrlQueueSuppliers = new ControlQueue();
+        $_SESSION['control_queue_suppliers'] = serialize($ctrlQueueSuppliers);
+        
+        $ctrlQueueContacts = new ControlQueue();
+        $_SESSION['control_queue_contacts'] = serialize($ctrlQueueContacts);
+
+        $ctrlQueueContracts = new ControlQueue();
+        $_SESSION['control_queue_contracts'] = serialize($ctrlQueueContracts);
     }
 
 

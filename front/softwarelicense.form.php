@@ -52,7 +52,30 @@ $license = new SoftwareLicense();
 
 if (isset($_POST["add"])) {
     $license->check(-1, CREATE, $_POST);
-    if ($newID = $license->add($_POST)) {
+    
+    $ctrlQueueAddLicense = unserialize($_SESSION['control_queue_licenses']);
+    $registry_licenses = $ctrlQueueAddLicense->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAddLicense->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $license->add($_POST);
+    }
+
+    if ($newID) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+       
+        if($registry_licenses->count() === 3){
+            $ctrlQueueAddLicense->popTopRegistryItem();
+        }
+        $ctrlQueueAddLicense->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+    
+        $_SESSION['control_queue_licenses'] = serialize($ctrlQueueAddLicense);
+
         Event::log(
             $_POST['softwares_id'],
             "software",
