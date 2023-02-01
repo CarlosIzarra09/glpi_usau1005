@@ -51,7 +51,29 @@ $enclosure = new Enclosure();
 if (isset($_POST["add"])) {
     $enclosure->check(-1, CREATE, $_POST);
 
-    if ($newID = $enclosure->add($_POST)) {
+    $ctrlQueueAddEnclosure = unserialize($_SESSION['control_queue_enclosures']);
+    $registry_enclosures = $ctrlQueueAddEnclosure->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAddEnclosure->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $enclosure->add($_POST);
+    }
+
+    if ($newID) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+       
+        if($registry_enclosures->count() === 3){
+            $ctrlQueueAddEnclosure->popTopRegistryItem();
+        }
+        $ctrlQueueAddEnclosure->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+    
+        $_SESSION['control_queue_enclosures'] = serialize($ctrlQueueAddEnclosure);
+
         Event::log(
             $newID,
             "enclosure",

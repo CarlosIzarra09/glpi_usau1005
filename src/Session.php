@@ -73,17 +73,64 @@ class Session
      * @return void
      */
     public static function initControlQueues(){
-        $ctrlQueueAddTicket = ControlQueueTicket::getInstance();
+        //ASSISTANCE
+        $ctrlQueueAddTicket = new ControlQueue();
         $_SESSION['control_queue_tickets'] = serialize($ctrlQueueAddTicket);
 
-        $ctrlQueueAddProblem = ControlQueueProblem::getInstance();
+        $ctrlQueueAddProblem = new ControlQueue();
         $_SESSION['control_queue_problems'] = serialize($ctrlQueueAddProblem);
 
-        $ctrlQueueAddChange = ControlQueueChange::getInstance();
+        $ctrlQueueAddChange = new ControlQueue();
         $_SESSION['control_queue_changes'] = serialize($ctrlQueueAddChange);
 
-        $ctrlQueueTicketRec = ControlQueueTicketRec::getInstance();
+        $ctrlQueueTicketRec = new ControlQueue();
         $_SESSION['control_queue_ticketrecurrents'] = serialize($ctrlQueueTicketRec);
+
+        //ASSETS
+        $ctrlQueueComputer = new ControlQueue();
+        $_SESSION['control_queue_computers'] = serialize($ctrlQueueComputer);
+
+        $ctrlQueueMonitor = new ControlQueue();
+        $_SESSION['control_queue_monitors'] = serialize($ctrlQueueMonitor);
+
+        $ctrlQueueSoftware = new ControlQueue();
+        $_SESSION['control_queue_softwares'] = serialize($ctrlQueueSoftware);
+
+        $ctrlQueueNetworkDevice = new ControlQueue();
+        $_SESSION['control_queue_networkdevices'] = serialize($ctrlQueueNetworkDevice);        
+
+        $ctrlQueueDevice = new ControlQueue();
+        $_SESSION['control_queue_devices'] = serialize($ctrlQueueDevice);
+
+        $ctrlQueuePrint = new ControlQueue();
+        $_SESSION['control_queue_printers'] = serialize($ctrlQueuePrint);
+
+        $ctrlQueueCartridge = new ControlQueue();
+        $_SESSION['control_queue_cartridges'] = serialize($ctrlQueueCartridge);
+
+        $ctrlQueueConsumables = new ControlQueue();
+        $_SESSION['control_queue_consumables'] = serialize($ctrlQueueConsumables);
+
+        $ctrlQueuePhones = new ControlQueue();
+        $_SESSION['control_queue_phones'] = serialize($ctrlQueuePhones);
+
+        $ctrlQueueRacks = new ControlQueue();
+        $_SESSION['control_queue_racks'] = serialize($ctrlQueueRacks);
+
+        $ctrlQueueEnclosures = new ControlQueue();
+        $_SESSION['control_queue_enclosures'] = serialize($ctrlQueueEnclosures);
+
+        $ctrlQueuePdus = new ControlQueue();
+        $_SESSION['control_queue_pdus'] = serialize($ctrlQueuePdus);
+
+        $ctrlQueuePassiveDCE = new ControlQueue();
+        $_SESSION['control_queue_passivedce'] = serialize($ctrlQueuePassiveDCE);
+
+        $ctrlQueueCable = new ControlQueue();
+        $_SESSION['control_queue_cables'] = serialize($ctrlQueueCable);
+
+        $ctrlQueueDevSimcard = new ControlQueue();
+        $_SESSION['control_queue_devsimcard'] = serialize($ctrlQueueDevSimcard);
     }
 
 

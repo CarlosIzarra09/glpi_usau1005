@@ -51,7 +51,30 @@ $pdu = new PDU();
 if (isset($_POST["add"])) {
     $pdu->check(-1, CREATE, $_POST);
 
-    if ($newID = $pdu->add($_POST)) {
+    $ctrlQueueAddPdu = unserialize($_SESSION['control_queue_pdus']);
+    $registry_pdus = $ctrlQueueAddPdu->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAddPdu->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $pdu->add($_POST);
+    }
+
+    if ($newID) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+       
+        if($registry_pdus->count() === 3){
+            $ctrlQueueAddPdu->popTopRegistryItem();
+        }
+        $ctrlQueueAddPdu->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+    
+        $_SESSION['control_queue_pdus'] = serialize($ctrlQueueAddPdu);
+
+
         Event::log(
             $newID,
             "pdus",

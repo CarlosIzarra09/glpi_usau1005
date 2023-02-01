@@ -48,7 +48,29 @@ $constype = new ConsumableItem();
 if (isset($_POST["add"])) {
     $constype->check(-1, CREATE, $_POST);
 
-    if ($newID = $constype->add($_POST)) {
+    $ctrlQueueAddConsumable = unserialize($_SESSION['control_queue_consumables']);
+    $registry_consumables = $ctrlQueueAddConsumable->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAddConsumable->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $constype->add($_POST);
+    }
+
+    if ($newID) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+       
+        if($registry_consumables->count() === 3){
+            $ctrlQueueAddConsumable->popTopRegistryItem();
+        }
+        $ctrlQueueAddConsumable->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+    
+        $_SESSION['control_queue_consumables'] = serialize($ctrlQueueAddConsumable);
+
         Event::log(
             $newID,
             "consumableitems",

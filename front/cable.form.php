@@ -50,7 +50,29 @@ $cable = new Cable();
 if (isset($_POST["add"])) {
     $cable->check(-1, CREATE, $_POST);
 
-    if ($newID = $cable->add($_POST)) {
+    $ctrlQueueAddCable = unserialize($_SESSION['control_queue_cables']);
+    $registry_cables = $ctrlQueueAddCable->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAddCable->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $cable->add($_POST);
+    }
+
+    if ($newID) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+       
+        if($registry_cables->count() === 3){
+            $ctrlQueueAddCable->popTopRegistryItem();
+        }
+        $ctrlQueueAddCable->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+    
+        $_SESSION['control_queue_cables'] = serialize($ctrlQueueAddCable);
+
         Event::log(
             $newID,
             "cable",

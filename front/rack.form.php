@@ -51,7 +51,29 @@ $rack = new Rack();
 if (isset($_POST["add"])) {
     $rack->check(-1, CREATE, $_POST);
 
-    if ($newID = $rack->add($_POST)) {
+    $ctrlQueueAddRack = unserialize($_SESSION['control_queue_racks']);
+    $registry_racks = $ctrlQueueAddRack->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAddRack->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $rack->add($_POST);
+    }
+
+    if ($newID) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+       
+        if($registry_racks->count() === 3){
+            $ctrlQueueAddRack->popTopRegistryItem();
+        }
+        $ctrlQueueAddRack->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+    
+        $_SESSION['control_queue_racks'] = serialize($ctrlQueueAddRack);
+
         Event::log(
             $newID,
             "racks",

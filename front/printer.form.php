@@ -50,7 +50,31 @@ $print = new Printer();
 if (isset($_POST["add"])) {
     $print->check(-1, CREATE, $_POST);
 
-    if ($newID = $print->add($_POST)) {
+    $ctrlQueueAddPrinter = unserialize($_SESSION['control_queue_printers']);
+    $registry_printers = $ctrlQueueAddPrinter->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAddPrinter->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $print->add($_POST);
+    }
+
+    if ($newID) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+       
+        if($registry_printers->count() === 3){
+            $ctrlQueueAddPrinter->popTopRegistryItem();
+        }
+        $ctrlQueueAddPrinter->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+    
+        $_SESSION['control_queue_printers'] = serialize($ctrlQueueAddPrinter);
+
+
+
         Event::log(
             $newID,
             "printers",

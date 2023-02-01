@@ -51,7 +51,29 @@ $passive_equip = new PassiveDCEquipment();
 if (isset($_POST["add"])) {
     $passive_equip->check(-1, CREATE, $_POST);
 
-    if ($newID = $passive_equip->add($_POST)) {
+    $ctrlQueueAddPassiveEquip = unserialize($_SESSION['control_queue_passivedce']);
+    $registry_passive_equip = $ctrlQueueAddPassiveEquip->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAddPassiveEquip->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $passive_equip->add($_POST);
+    }
+
+    if ($newID) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+       
+        if($registry_passive_equip->count() === 3){
+            $ctrlQueueAddPassiveEquip->popTopRegistryItem();
+        }
+        $ctrlQueueAddPassiveEquip->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+    
+        $_SESSION['control_queue_passivedce'] = serialize($ctrlQueueAddPassiveEquip);
+
         Event::log(
             $newID,
             "passivedcequipment",

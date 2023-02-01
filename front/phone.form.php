@@ -51,7 +51,30 @@ $phone = new Phone();
 if (isset($_POST["add"])) {
     $phone->check(-1, CREATE, $_POST);
 
-    if ($newID = $phone->add($_POST)) {
+    $ctrlQueueAddPhone = unserialize($_SESSION['control_queue_phones']);
+    $registry_phones = $ctrlQueueAddPhone->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAddPhone->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $phone->add($_POST);
+    }
+
+
+    if ($newID) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+       
+        if($registry_phones->count() === 3){
+            $ctrlQueueAddPhone->popTopRegistryItem();
+        }
+        $ctrlQueueAddPhone->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+    
+        $_SESSION['control_queue_phones'] = serialize($ctrlQueueAddPhone);
+
         Event::log(
             $newID,
             "phones",

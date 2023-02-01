@@ -51,7 +51,30 @@ $peripheral = new Peripheral();
 if (isset($_POST["add"])) {
     $peripheral->check(-1, CREATE, $_POST);
 
-    if ($newID = $peripheral->add($_POST)) {
+    $ctrlQueueAddPeripheral = unserialize($_SESSION['control_queue_devices']);
+    $registry_peripherals = $ctrlQueueAddPeripheral->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAddPeripheral->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $peripheral->add($_POST);
+    }
+
+    if ($newID) {
+
+        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+       
+        if($registry_peripherals->count() === 3){
+            $ctrlQueueAddPeripheral->popTopRegistryItem();
+        }
+        $ctrlQueueAddPeripheral->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+    
+        $_SESSION['control_queue_devices'] = serialize($ctrlQueueAddPeripheral);
+
+
         Event::log(
             $newID,
             "peripherals",
