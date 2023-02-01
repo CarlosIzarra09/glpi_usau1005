@@ -56,7 +56,7 @@ if (isset($_POST["add"])) {
 
     $newID = false;
    
-    if($ctrlQueueAddComputer->checkAnormalTimestampOnQueueItems()){
+    if($ctrlQueueAddMonitor->checkAnormalTimestampOnQueueItems()){
         Session::cleanOnLogout();
         Session::redirectIfNotLoggedIn();
     }else{
