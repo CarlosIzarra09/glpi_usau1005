@@ -4,7 +4,7 @@ Class ControlQueue {
     protected $registry;
     protected static $instance;
 
-    protected function __construct(){
+    public function __construct(){
         $this->registry = new SplQueue();
     }
 
@@ -30,9 +30,36 @@ Class ControlQueue {
         $this->registry->dequeue();
     }
 
+    /**
+       * this function checks if there are 3 queued items whose timestamps
+       * differ by less than 1 second between the 3
+       * @return bool
+       */  
+    public function checkAnormalTimestampOnQueueItems() : bool{
+        if($this->registry->count() === 3){
+            $this->registry->rewind();
+            $time1 = strtotime($this->registry->current());
+            $this->registry->next();
+            $time2 = strtotime($this->registry->current());
+            $this->registry->next();
+            $time3 = strtotime($this->registry->current());
+
+            if (
+                (($time2 - $time1 === 0) && ($time3 - $time1 === 0))
+                || ($time3 - $time2 === 0)
+                ) 
+            {
+                return true;
+            }
+
+            return false;
+        }
+        return false;
+    }
+
 }
 
-
+/*
 Class ControlQueueTicket extends ControlQueue {
 
 }
@@ -48,6 +75,22 @@ Class ControlQueueChange extends ControlQueue{
 Class ControlQueueTicketRec extends ControlQueue{
     
 }
+
+Class ControlQueueComputer extends ControlQueue{
+
+}
+
+Class ControlQueueMonitor extends ControlQueue{
+
+}
+
+Class ControlQueueSoftware extends ControlQueue {
+
+}
+
+Class ControlQueueNetworkDevice extends ControlQueue {
+    
+}*/
 
 
 

@@ -129,14 +129,8 @@ if (isset($_POST["add"])) {
 
     $itemAdded = false;
    
-    if($registry_tickets->count() === 3){
-        $registry_tickets->rewind();
-        $time1 = strtotime($registry_tickets->current());
-        $registry_tickets->next();
-        $time2 = strtotime($registry_tickets->current());
-        $registry_tickets->next();
-        $time3 = strtotime($registry_tickets->current());
-        
+    if($ctrlQueueAddTicket->checkAnormalTimestampOnQueueItems()){
+       
 
         /*Toolbox::logInFile(
             'diferencia_seg',
@@ -151,16 +145,8 @@ if (isset($_POST["add"])) {
             )
         );*/
 
-        
-        if((
-            ($time2 - $time1 === 0) && ($time3 - $time1 === 0))
-            || ($time3 - $time2 === 0)
-            ){
-            Session::cleanOnLogout();
-            Html::redirectToLogin();
-        }else{
-            $itemAdded = $track->add($_POST);
-        }
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
 
     }else{
         $itemAdded = $track->add($_POST);

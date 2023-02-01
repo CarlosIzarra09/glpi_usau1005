@@ -58,24 +58,9 @@ if (isset($_POST["add"])) {
 
     $newID = false;
    
-    if($registry_changes->count() === 3){
-        $registry_changes->rewind();
-        $time1 = strtotime($registry_changes->current());
-        $registry_changes->next();
-        $time2 = strtotime($registry_changes->current());
-        $registry_changes->next();
-        $time3 = strtotime($registry_changes->current());
-                
-        if((
-            ($time2 - $time1 === 0) && ($time3 - $time1 === 0))
-            || ($time3 - $time2 === 0)
-            ){
-            Session::cleanOnLogout();
-            Html::redirectToLogin();
-        }else{
-            $newID = $change->add($_POST);
-        }
-
+    if($ctrlQueueAddChange->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
     }else{
         $newID = $change->add($_POST);
     }
