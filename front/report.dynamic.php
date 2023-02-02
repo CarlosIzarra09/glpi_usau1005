@@ -121,6 +121,54 @@ if (isset($_GET["item_type"]) && isset($_GET["display_type"])) {
             }
             $params = Search::manageParams($_GET["item_type"], $_GET);
 
+            date_default_timezone_set("America/Lima");
+
+            
+
+            $current_time = date("Y-m-d H:i:s"); 
+
+            if($_SESSION['n_reports_generated'] == 10){
+                $_SESSION['n_reports_generated'] = 0;
+
+                
+                $_SESSION['until_waited_datetime'] = date("H:i:s", strtotime($current_time.' +180 seconds')); 
+            }
+
+            if($_SESSION['total_reports_generated'] == 20){
+                $_SESSION['total_reports_generated'] = 0;
+                Session::cleanOnLogout();
+                Session::redirectIfNotLoggedIn();
+                exit();
+            }
+
+            /*Toolbox::logInFile(
+                'report_dynamic_times',
+                sprintf(
+                    __('%1$s: %2$s'),
+                    basename(__FILE__,'.php'),
+                    sprintf(
+                        __('Tiempo actual %s, Tiempo hasta esperar: %s, Total reportes generados: %s') . "\n",
+                        date("Y-m-d H:i:s"),
+                        $_SESSION['until_waited_datetime'],
+                        $_SESSION['n_reports_generated']
+                    )
+                )
+            );*/
+
+            if(strtotime(date("Y-m-d H:i:s")) < strtotime($_SESSION['until_waited_datetime'])){
+                $msg_redirect = "Realizaste muchas descargas, espera hasta las ".$_SESSION['until_waited_datetime']." para volver a intentarlo";
+
+                
+                Session::addMessageAfterRedirect($msg_redirect,false,INFO,true);
+                Html::back(); 
+            }else{
+
+                $_SESSION['n_reports_generated'] =  $_SESSION['n_reports_generated'] + 1;
+                $_SESSION['total_reports_generated'] =  $_SESSION['total_reports_generated'] + 1;
+
+                Search::showList($_GET["item_type"], $params);
+            }
+
             //$_SESSION['status_downl_tickets'] = 0;
 
             /*if($_SESSION['status_downl_tickets'] === 1 || 
@@ -164,7 +212,7 @@ if (isset($_GET["item_type"]) && isset($_GET["display_type"])) {
                 Html::back();
                 //$_SESSION['status_downl_tickets'] = 1;
             }*/
-            Search::showList($_GET["item_type"], $params);
+            //Search::showList($_GET["item_type"], $params);
             
 
             

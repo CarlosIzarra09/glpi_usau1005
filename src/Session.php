@@ -236,6 +236,9 @@ class Session
             //$ctrlQueueTicket = ControlQueuesTickets::getInstance();
             //$_SESSION['control_queues_tickets'] = serialize($ctrlQueueTicket);
 
+            $_SESSION['n_reports_generated'] = 0;
+            $_SESSION['total_reports_generated'] = 0;
+            $_SESSION['until_waited_datetime'] = date("Y-m-d H:i:s");
             // Init control queues
             self::initControlQueues();
              
