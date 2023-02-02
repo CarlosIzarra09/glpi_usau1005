@@ -50,7 +50,32 @@ Session::checkLoginUser();
 if (isset($_POST["add"])) {
     $rssfeed->check(-1, CREATE, $_POST);
 
-    $newID = $rssfeed->add($_POST);
+    $ctrlQueueAdd = unserialize($_SESSION['control_queue_rssfeeds']);
+    $registry = $ctrlQueueAdd->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAdd->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $rssfeed->add($_POST);
+    }
+
+
+    if ($newID) {
+
+        $currentDatetime = new DateTime(null, new DateTimeZone('America/Lima'));
+
+        if ($registry->count() === 3) {
+            $ctrlQueueAdd->popTopRegistryItem();
+        }
+        $ctrlQueueAdd->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
+
+        $_SESSION['control_queue_rssfeeds'] = serialize($ctrlQueueAdd);
+    }
+
+
     Event::log(
         $newID,
         "rssfeed",

@@ -168,7 +168,22 @@ class Session
 
         $ctrlQueueDatabases= new ControlQueue();
         $_SESSION['control_queue_databases'] = serialize($ctrlQueueDatabases);
+
+        //Tools
+        $ctrlQueueProjects = new ControlQueue();
+        $_SESSION['control_queue_projects'] = serialize($ctrlQueueProjects);
         
+        $ctrlQueueReminders = new ControlQueue();
+        $_SESSION['control_queue_reminders'] = serialize($ctrlQueueReminders);
+
+        $ctrlQueueRssfeed = new ControlQueue();
+        $_SESSION['control_queue_rssfeeds'] = serialize($ctrlQueueRssfeed);
+
+        $ctrlQueueKnowledgebase = new ControlQueue();
+        $_SESSION['control_queue_knowledgebases'] = serialize($ctrlQueueKnowledgebase);
+
+        //Administration
+
     }
 
 
