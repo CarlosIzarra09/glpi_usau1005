@@ -183,6 +183,16 @@ class Session
         $_SESSION['control_queue_knowledgebases'] = serialize($ctrlQueueKnowledgebase);
 
         //Administration
+        $ctrlQueueUsers = new ControlQueue();
+        $_SESSION['control_queue_users'] = serialize($ctrlQueueUsers);
+
+        $ctrlQueueGroups = new ControlQueue();
+        $_SESSION['control_queue_groups'] = serialize($ctrlQueueGroups);
+        
+       
+
+        $ctrlQueueProfiles = new ControlQueue();
+        $_SESSION['control_queue_profiles'] = serialize($ctrlQueueProfiles);
 
     }
 
