@@ -51,7 +51,29 @@ $datacenter = new Datacenter();
 if (isset($_POST["add"])) {
     $datacenter->check(-1, CREATE, $_POST);
 
-    if ($newID = $datacenter->add($_POST)) {
+    $ctrlQueueAddDatacenter = unserialize($_SESSION['control_queue_datacenters']);
+    $registry_datacenters = $ctrlQueueAddDatacenter->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAddDatacenter->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $datacenter->add($_POST);
+    }
+
+    if ($newID) {
+
+        $currentDatetime = new DateTime(null,new DateTimeZone('America/Lima'));
+              
+        if($registry_datacenters->count() === 3){
+            $ctrlQueueAddDatacenter->popTopRegistryItem();
+        }
+        $ctrlQueueAddDatacenter->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
+
+        $_SESSION['control_queue_datacenters'] = serialize($ctrlQueueAddDatacenter);
+
         Event::log(
             $newID,
             "datacenters",

@@ -51,7 +51,33 @@ $app = new Appliance();
 if (isset($_POST["add"])) {
     $app->check(-1, CREATE, $_POST);
 
-    if ($newID = $app->add($_POST)) {
+    $ctrlQueueAdd = unserialize($_SESSION['control_queue_appliances']);
+    $registry = $ctrlQueueAdd->getRegistryQueue();
+
+    $newID = false;
+   
+    if($ctrlQueueAdd->checkAnormalTimestampOnQueueItems()){
+        Session::cleanOnLogout();
+        Session::redirectIfNotLoggedIn();
+    }else{
+        $newID = $app->add($_POST);
+    }
+
+
+
+    if ($newID) {
+
+        $currentDatetime = new DateTime(null,new DateTimeZone('America/Lima'));
+              
+        if($registry->count() === 3){
+            $ctrlQueueAdd->popTopRegistryItem();
+        }
+        $ctrlQueueAdd->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
+
+        $_SESSION['control_queue_appliances'] = serialize($ctrlQueueAdd);
+
+
+
         Event::log(
             $newID,
             "appliance",

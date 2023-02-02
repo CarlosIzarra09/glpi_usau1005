@@ -147,6 +147,28 @@ class Session
 
         $ctrlQueueContracts = new ControlQueue();
         $_SESSION['control_queue_contracts'] = serialize($ctrlQueueContracts);
+
+        $ctrlQueueDocument = new ControlQueue();
+        $_SESSION['control_queue_documents'] = serialize($ctrlQueueDocument);
+
+        $ctrlQueueCertificate = new ControlQueue();
+        $_SESSION['control_queue_certificates'] = serialize($ctrlQueueCertificate);
+
+        $ctrlQueueDatacenter = new ControlQueue();
+        $_SESSION['control_queue_datacenters'] = serialize($ctrlQueueDatacenter);
+
+        $ctrlQueueClusters = new ControlQueue();
+        $_SESSION['control_queue_clusters'] = serialize($ctrlQueueClusters);
+
+        $ctrlQueueDomains= new ControlQueue();
+        $_SESSION['control_queue_domains'] = serialize($ctrlQueueDomains);
+
+        $ctrlQueueAppliances= new ControlQueue();
+        $_SESSION['control_queue_appliances'] = serialize($ctrlQueueAppliances);
+
+        $ctrlQueueDatabases= new ControlQueue();
+        $_SESSION['control_queue_databases'] = serialize($ctrlQueueDatabases);
+        
     }
 
 

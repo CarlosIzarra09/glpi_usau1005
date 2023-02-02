@@ -55,7 +55,31 @@ if (isset($_POST["add"])) {
             $_POST['_filename']        = [$fic[$key]];
             $_POST['_tag_filename']    = [$tag[$key]];
             $_POST['_prefix_filename'] = [$prefix[$key]];
-            if ($newID = $doc->add($_POST)) {
+
+
+            $ctrlQueueAddDoc = unserialize($_SESSION['control_queue_documents']);
+            $registry_docs = $ctrlQueueAddDoc->getRegistryQueue();
+        
+            $newID = false;
+           
+            if($ctrlQueueAddDoc->checkAnormalTimestampOnQueueItems()){
+                Session::cleanOnLogout();
+                Session::redirectIfNotLoggedIn();
+            }else{
+                $newID = $doc->add($_POST);
+            }
+
+            if ($newID) {
+
+                $currentDatetime = new DateTime(null,new DateTimeZone('America/Lima'));
+              
+                if($registry_docs->count() === 3){
+                    $ctrlQueueAddDoc->popTopRegistryItem();
+                }
+                $ctrlQueueAddDoc->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
+
+                $_SESSION['control_queue_documents'] = serialize($ctrlQueueAddDoc);
+
                 Event::log(
                     $newID,
                     "documents",

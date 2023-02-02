@@ -199,7 +199,8 @@ if (isset($_POST["add"])) {
     
     if ($itemAdded) {
 
-        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+        //$currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+        $currentDatetime = new DateTime(null,new DateTimeZone('America/Lima'));
         /*Toolbox::logInFile(
             'event_add_item',
             sprintf(
@@ -215,8 +216,9 @@ if (isset($_POST["add"])) {
         if($registry_tickets->count() === 3){
             $ctrlQueueAddTicket->popTopRegistryItem();
         }
-        $ctrlQueueAddTicket->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
-        
+        $ctrlQueueAddTicket->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
+
+           
 
         /*Toolbox::logInFile(
             'event_add_item',

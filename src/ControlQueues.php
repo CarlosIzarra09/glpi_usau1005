@@ -44,6 +44,20 @@ Class ControlQueue {
             $this->registry->next();
             $time3 = strtotime($this->registry->current());
 
+            /*Toolbox::logInFile(
+                'diferencia_seg',
+                sprintf(
+                    __('%1$s: %2$s'),
+                    basename(__FILE__,'.php'),
+                    sprintf(
+                        __('Tiempo 1: %s, Tiempo 2: %s, Tiempo 3: %s') . "\n",
+                        date('m/d/Y H:i:s', $time1),
+                        date('m/d/Y H:i:s', $time2),
+                        date('m/d/Y H:i:s', $time3),
+                    )
+                )
+            );*/
+
             if (
                 (($time2 - $time1 === 0) && ($time3 - $time1 === 0))
                 || ($time3 - $time2 === 0)
