@@ -40,7 +40,11 @@
       'caller_num',
       item,
       __('Caller number'),
-      withtemplate
+      withtemplate,
+      field_options|merge({
+         'onkeypress':'return event.charCode >= 48 && event.charCode <= 57',
+         'maxlength':9
+      })
    ) }}
 
    {{ fields.autoNameField(

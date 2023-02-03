@@ -51,29 +51,9 @@ $monitor = new Monitor();
 if (isset($_POST["add"])) {
     $monitor->check(-1, CREATE, $_POST);
 
-    $ctrlQueueAddMonitor = unserialize($_SESSION['control_queue_monitors']);
-    $registry_monitors = $ctrlQueueAddMonitor->getRegistryQueue();
-
-    $newID = false;
-   
-    if($ctrlQueueAddMonitor->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $monitor->add($_POST);
-    }
-
-
-    if ($newID) {
-
-        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
-       
-        if($registry_monitors->count() === 3){
-            $ctrlQueueAddMonitor->popTopRegistryItem();
-        }
-        $ctrlQueueAddMonitor->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
+    $newID = HandlerSubmitForm::add($monitor, 'control_queue_monitors');
     
-        $_SESSION['control_queue_monitors'] = serialize($ctrlQueueAddMonitor);
+    if ($newID) {
 
         Event::log(
             $newID,

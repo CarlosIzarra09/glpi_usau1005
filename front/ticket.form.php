@@ -75,8 +75,8 @@ if (isset($_UPOST['_actors'])) {
 if (isset($_POST["add"])) {
     $track->check(-1, CREATE, $_POST);
     //$registry_tickets = $ctrlQueueAddTicket->getRegistryTickets();
-    $ctrlQueueAddTicket = unserialize($_SESSION['control_queue_tickets']);
-    $registry_tickets = $ctrlQueueAddTicket->getRegistryQueue();
+    //$ctrlQueueAddTicket = unserialize($_SESSION['control_queue_tickets']);
+    //$registry_tickets = $ctrlQueueAddTicket->getRegistryQueue();
     //$itemAdded = $track->add($_POST);
     //$registry_tickets_stack = ControlQueuesTickets::getRegistryTickets();
 
@@ -127,9 +127,9 @@ if (isset($_POST["add"])) {
     }*/
     //$registry_tickets_stack = $GLOBALS['registry_tickets_stack'];
 
-    $itemAdded = false;
+    //$itemAdded = false;
    
-    if($ctrlQueueAddTicket->checkAnormalTimestampOnQueueItems()){
+    //if($ctrlQueueAddTicket->checkAnormalTimestampOnQueueItems()){
        
 
         /*Toolbox::logInFile(
@@ -145,12 +145,12 @@ if (isset($_POST["add"])) {
             )
         );*/
 
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
+      //  Session::cleanOnLogout();
+      //  Session::redirectIfNotLoggedIn();
 
-    }else{
-        $itemAdded = $track->add($_POST);
-    }
+    //}else{
+    //    $itemAdded = $track->add($_POST);
+    //}
 
 
 
@@ -197,10 +197,10 @@ if (isset($_POST["add"])) {
     }*/
 
     
-    if ($itemAdded) {
+    //if ($itemAdded) {
 
         //$currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
-        $currentDatetime = new DateTime(null,new DateTimeZone('America/Lima'));
+        //$currentDatetime = new DateTime(null,new DateTimeZone('America/Lima'));
         /*Toolbox::logInFile(
             'event_add_item',
             sprintf(
@@ -213,10 +213,10 @@ if (isset($_POST["add"])) {
                 )
             )
         );*/
-        if($registry_tickets->count() === 3){
-            $ctrlQueueAddTicket->popTopRegistryItem();
-        }
-        $ctrlQueueAddTicket->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
+        //if($registry_tickets->count() === 3){
+          //  $ctrlQueueAddTicket->popTopRegistryItem();
+       // }
+        //$ctrlQueueAddTicket->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
 
            
 
@@ -233,8 +233,11 @@ if (isset($_POST["add"])) {
             )
         );*/
 
-        $_SESSION['control_queue_tickets'] = serialize($ctrlQueueAddTicket);
-        
+        //$_SESSION['control_queue_tickets'] = serialize($ctrlQueueAddTicket);
+    
+    $newID = HandlerSubmitForm::add($track, 'control_queue_tickets');  
+      
+    if($newID){
         
 
         if ($_SESSION['glpibackcreated']) {

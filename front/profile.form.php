@@ -46,31 +46,7 @@ $prof = new Profile();
 if (isset($_POST["add"])) {
     $prof->check(-1, CREATE, $_POST);
 
-    $ctrlQueueAdd = unserialize($_SESSION['control_queue_profiles']);
-    $registry = $ctrlQueueAdd->getRegistryQueue();
-
-    $ID = false;
-   
-    if($ctrlQueueAdd->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $ID = $prof->add($_POST);
-    }
-
-    if ($ID) {
-
-        $currentDatetime = new DateTime(null, new DateTimeZone('America/Lima'));
-
-        if ($registry->count() === 3) {
-            $ctrlQueueAdd->popTopRegistryItem();
-        }
-        $ctrlQueueAdd->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
-
-        $_SESSION['control_queue_profiles'] = serialize($ctrlQueueAdd);
-    }
-
-    
+    $ID = HandlerSubmitForm::add($prof, 'control_queue_profiles');
 
    // We need to redirect to form to enter rights
     Html::redirect($prof->getFormURLWithID($ID));

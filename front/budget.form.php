@@ -50,29 +50,9 @@ $budget = new Budget();
 if (isset($_POST["add"])) {
     $budget->check(-1, CREATE, $_POST);
     
-    $ctrlQueueAddBudget = unserialize($_SESSION['control_queue_budgets']);
-    $registry_budgets = $ctrlQueueAddBudget->getRegistryQueue();
-
-    $newID = false;
-   
-    if($ctrlQueueAddBudget->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $budget->add($_POST);
-    }
+    $newId = HandlerSubmitForm::add($budget, 'control_queue_budgets');
     
-    if ($newID) {
-
-        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
-       
-        if($registry_budgets->count() === 3){
-            $ctrlQueueAddBudget->popTopRegistryItem();
-        }
-        $ctrlQueueAddBudget->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
-    
-        $_SESSION['control_queue_budgets'] = serialize($ctrlQueueAddBudget);
-
+    if ($newID) {    
         Event::log(
             $newID,
             "budget",

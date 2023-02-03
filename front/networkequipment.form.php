@@ -50,30 +50,9 @@ $netdevice = new NetworkEquipment();
 if (isset($_POST["add"])) {
     $netdevice->check(-1, CREATE, $_POST);
 
-    $ctrlQueueAddNetDevice = unserialize($_SESSION['control_queue_networkdevices']);
-    $registry_netdevices = $ctrlQueueAddNetDevice->getRegistryQueue();
-
-    $newID = false;
-   
-    if($ctrlQueueAddNetDevice->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $netdevice->add($_POST);
-    }
-
+    $newID = HandlerSubmitForm::add($netdevice, 'control_queue_networkdevices');
 
     if ($newID) {
-
-        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
-       
-        if($registry_netdevices->count() === 3){
-            $ctrlQueueAddNetDevice->popTopRegistryItem();
-        }
-        $ctrlQueueAddNetDevice->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
-    
-        $_SESSION['control_queue_networkdevices'] = serialize($ctrlQueueAddNetDevice);
-
 
         Event::log(
             $newID,

@@ -59,31 +59,9 @@ if (isset($_POST["id"])) {
 if (isset($_POST["add"])) {
     $dropdown->check(-1, CREATE, $_POST);
 
-    $ctrlQueueTicketRec = unserialize($_SESSION['control_queue_ticketrecurrents']);
-    $registry_ticketrecs = $ctrlQueueTicketRec->getRegistryQueue();
-
-    $newID = false;
-
-    if($ctrlQueueTicketRec->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-
-    }else{
-        $newID = $dropdown->add($_POST);
-    }
-
-
-    if ($newID) {
-
-        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+    $newID = HandlerSubmitForm::add($dropdown, 'control_queue_ticketrecurrents');
     
-        if($registry_ticketrecs->count() === 3){
-            $ctrlQueueTicketRec->popTopRegistryItem();
-        }
-        $ctrlQueueTicketRec->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
-        
-        $_SESSION['control_queue_ticketrecurrents'] = serialize($ctrlQueueTicketRec);
-
+    if ($newID) {
 
         if ($dropdown instanceof CommonDevice) {
             Event::log(

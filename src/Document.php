@@ -476,7 +476,7 @@ class Document extends CommonDBTM
         echo "<tr class='tab_bg_1'>";
         echo "<td>" . __('Web link') . "</td>";
         echo "<td>";
-        echo Html::input('link', ['value' => $this->fields['link']]);
+        echo Html::input('link', ['value' => $this->fields['link'],'placeholder' => 'https://']);
         echo "</td>";
         echo "<td rowspan='3' class='middle'>" . __('Comments') . "</td>";
         echo "<td class='middle' rowspan='3'>";

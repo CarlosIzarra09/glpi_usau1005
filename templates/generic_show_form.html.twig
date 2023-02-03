@@ -168,7 +168,13 @@
                      {% endif %}
 
                      {% if item.isField('date_domaincreation') %}
-                        {{ fields.datetimeField('date_domaincreation', item.fields['date_domaincreation'], __('Registration date')) }}
+                        {{ fields.datetimeField('date_domaincreation', 
+                        item.fields['date_domaincreation'], 
+                        __('Registration date'),
+                        {
+                           'required': true 
+                        }|merge(field_options))
+                        }}
                      {% endif %}
 
                      {% set type_itemtype = item.getTypeClass() %}

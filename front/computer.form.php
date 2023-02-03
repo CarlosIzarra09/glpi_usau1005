@@ -52,29 +52,9 @@ $computer = new Computer();
 if (isset($_POST["add"])) {
     $computer->check(-1, CREATE, $_POST);
 
-    $ctrlQueueAddComputer = unserialize($_SESSION['control_queue_computers']);
-    $registry_computers = $ctrlQueueAddComputer->getRegistryQueue();
-
-    $newID = false;
-   
-    if($ctrlQueueAddComputer->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $computer->add($_POST);
-    }
-
+    $newID = HandlerSubmitForm::add($computer, 'control_queue_computers');
 
     if ($newID) {
-
-        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
-       
-        if($registry_computers->count() === 3){
-            $ctrlQueueAddComputer->popTopRegistryItem();
-        }
-        $ctrlQueueAddComputer->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
-    
-        $_SESSION['control_queue_computers'] = serialize($ctrlQueueAddComputer);
 
         Event::log(
             $newID,

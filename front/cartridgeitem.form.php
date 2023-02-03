@@ -48,28 +48,9 @@ $cartype = new CartridgeItem();
 if (isset($_POST["add"])) {
     $cartype->check(-1, CREATE, $_POST);
 
-    $ctrlQueueAddCartridge = unserialize($_SESSION['control_queue_cartridges']);
-    $registry_cartridges = $ctrlQueueAddCartridge->getRegistryQueue();
-
-    $newID = false;
-   
-    if($ctrlQueueAddCartridge->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $cartype->add($_POST);
-    }
-
+    $newID = HandlerSubmitForm::add($cartype, 'control_queue_cartridges');
+  
     if ($newID) {
-
-        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
-       
-        if($registry_cartridges->count() === 3){
-            $ctrlQueueAddCartridge->popTopRegistryItem();
-        }
-        $ctrlQueueAddCartridge->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
-    
-        $_SESSION['control_queue_cartridges'] = serialize($ctrlQueueAddCartridge);
 
         Event::log(
             $newID,

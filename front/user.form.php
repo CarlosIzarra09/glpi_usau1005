@@ -61,30 +61,10 @@ if (isset($_GET['getvcard'])) {
     $user->generateVcard();
 } else if (isset($_POST["add"])) {
     $user->check(-1, CREATE, $_POST);
-
-    $ctrlQueueAdd = unserialize($_SESSION['control_queue_users']);
-    $registry = $ctrlQueueAdd->getRegistryQueue();
-
-    $newID = false;
+  
+    $newID = HandlerSubmitForm::add($user, 'control_queue_users');
    
-    if($ctrlQueueAdd->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $user->add($_POST);
-    }
-
-
     if ($newID) {
-
-        $currentDatetime = new DateTime(null,new DateTimeZone('America/Lima'));
-              
-        if($registry->count() === 3){
-            $ctrlQueueAdd->popTopRegistryItem();
-        }
-        $ctrlQueueAdd->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
-
-        $_SESSION['control_queue_users'] = serialize($ctrlQueueAdd);
 
         Event::log(
             $newID,

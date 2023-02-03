@@ -62,31 +62,10 @@ if (isset($_POST["id"])) {
 
 if (isset($_POST["add"])) {
     $item_device->check(-1, CREATE, $_POST);
-
-    $ctrlQueueAddItemDevice = unserialize($_SESSION['control_queue_devsimcard']);
-    $registry_devsimcard = $ctrlQueueAddItemDevice->getRegistryQueue();
-
-    $newID = false;
-   
-    if($ctrlQueueAddItemDevice->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $item_device->add($_POST);
-    }
-
+    
+    $newID = HandlerSubmitForm::add($item_device, 'control_queue_devsimcard');
     
     if ($newID) {
-
-        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
-       
-        if($registry_devsimcard->count() === 3){
-            $ctrlQueueAddItemDevice->popTopRegistryItem();
-        }
-        
-        $ctrlQueueAddItemDevice->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
-    
-        $_SESSION['control_queue_devsimcard'] = serialize($ctrlQueueAddItemDevice);
 
         Event::log(
             $newID,

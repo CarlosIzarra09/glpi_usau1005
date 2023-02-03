@@ -51,28 +51,9 @@ $certificate = new Certificate();
 if (isset($_POST["add"])) {
     $certificate->check(-1, CREATE, $_POST);
 
-    $ctrlQueueAddCert = unserialize($_SESSION['control_queue_certificates']);
-    $registry_certs = $ctrlQueueAddCert->getRegistryQueue();
-
-    $newID = false;
-   
-    if($ctrlQueueAddCert->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $certificate->add($_POST);
-    }
+    $newID = HandlerSubmitForm::add($certificate, 'control_queue_certificates');
 
     if ($newID) {
-
-        $currentDatetime = new DateTime(null,new DateTimeZone('America/Lima'));
-              
-        if($registry_certs->count() === 3){
-            $ctrlQueueAddCert->popTopRegistryItem();
-        }
-        $ctrlQueueAddCert->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
-
-        $_SESSION['control_queue_certificates'] = serialize($ctrlQueueAddCert);
 
         Event::log(
             $newID,

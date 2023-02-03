@@ -53,30 +53,9 @@ $problem = new Problem();
 if (isset($_POST["add"])) {
     $problem->check(-1, CREATE, $_POST);
 
-    $ctrlQueueAddProblem = unserialize($_SESSION['control_queue_problems']);
-    $registry_problems = $ctrlQueueAddProblem->getRegistryQueue();
-
-    $newID = false;
-   
-    if($ctrlQueueAddProblem->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $problem->add($_POST);
-    }
-
-
-
-    if ($newID) {
-
-        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
+    $newID = HandlerSubmitForm::add($problem, 'control_queue_problems');
     
-        if($registry_problems->count() === 3){
-            $ctrlQueueAddProblem->popTopRegistryItem();
-        }
-        $ctrlQueueAddProblem->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
-        
-        $_SESSION['control_queue_problems'] = serialize($ctrlQueueAddProblem);
+    if ($newID) {
 
         Event::log(
             $newID,

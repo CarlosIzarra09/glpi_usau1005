@@ -51,29 +51,10 @@ $database = new Database();
 if (isset($_POST["add"])) {
     $database->check(-1, CREATE, $_POST);
 
-    $ctrlQueueAdd = unserialize($_SESSION['control_queue_databases']);
-    $registry = $ctrlQueueAdd->getRegistryQueue();
-
-    $newID = false;
-   
-    if($ctrlQueueAdd->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $database->add($_POST);
-    }
-
+    $newID = HandlerSubmitForm::add($database, 'control_queue_databases');
+    
     if ($newID) {
         
-        $currentDatetime = new DateTime(null,new DateTimeZone('America/Lima'));
-              
-        if($registry->count() === 3){
-            $ctrlQueueAdd->popTopRegistryItem();
-        }
-        $ctrlQueueAdd->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
-
-        $_SESSION['control_queue_databases'] = serialize($ctrlQueueAdd);
-
         Event::log(
             $newID,
             "database",

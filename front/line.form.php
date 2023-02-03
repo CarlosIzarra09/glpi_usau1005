@@ -51,30 +51,9 @@ $line = new Line();
 if (isset($_POST["add"])) {
     $line->check(-1, CREATE, $_POST);
 
-    $ctrlQueueAddLine = unserialize($_SESSION['control_queue_lines']);
-    $registry_lines = $ctrlQueueAddLine->getRegistryQueue();
-
-    $newID = false;
-   
-    if($ctrlQueueAddLine->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $line->add($_POST);
-    }
-
+    $newID = HandlerSubmitForm::add($line, 'control_queue_lines');
 
     if ($newID) {
-
-        $currentDatetime = new DateTime(null,new DateTimeZone('America/Lima'));
-              
-        if($registry_lines->count() === 3){
-            $ctrlQueueAddLine->popTopRegistryItem();
-        }
-        $ctrlQueueAddLine->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
-
-        $_SESSION['control_queue_lines'] = serialize($ctrlQueueAddLine);
-
 
         Event::log(
             $newID,

@@ -52,28 +52,9 @@ $contract         = new Contract();
 if (isset($_POST["add"])) {
     $contract->check(-1, CREATE, $_POST);
 
-    $ctrlQueueAddContract = unserialize($_SESSION['control_queue_contracts']);
-    $registry_contracts = $ctrlQueueAddContract->getRegistryQueue();
-
-    $newID = false;
-   
-    if($ctrlQueueAddContract->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $contract->add($_POST);
-    }
+    $newID = HandlerSubmitForm::add($contract, 'control_queue_contracts');    
 
     if ($newID) {
-
-        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
-       
-        if($registry_contracts->count() === 3){
-            $ctrlQueueAddContract->popTopRegistryItem();
-        }
-        $ctrlQueueAddContract->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
-    
-        $_SESSION['control_queue_contracts'] = serialize($ctrlQueueAddContract);
 
         Event::log(
             $newID,

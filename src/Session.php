@@ -74,10 +74,10 @@ class Session
      */
     public static function initControlQueues(){
         //ASSISTANCE
-        $ctrlQueueAddTicket = new ControlQueue();
-        $_SESSION['control_queue_tickets'] = serialize($ctrlQueueAddTicket);
+        //$ctrlQueueAddTicket = new ControlQueue();
+        //$_SESSION['control_queue_tickets'] = serialize($ctrlQueueAddTicket);
 
-        $ctrlQueueAddProblem = new ControlQueue();
+        /*$ctrlQueueAddProblem = new ControlQueue();
         $_SESSION['control_queue_problems'] = serialize($ctrlQueueAddProblem);
 
         $ctrlQueueAddChange = new ControlQueue();
@@ -151,6 +151,9 @@ class Session
         $ctrlQueueDocument = new ControlQueue();
         $_SESSION['control_queue_documents'] = serialize($ctrlQueueDocument);
 
+        $ctrlQueueLine = new ControlQueue();
+        $_SESSION['control_queue_lines'] = serialize($ctrlQueueLine);
+
         $ctrlQueueCertificate = new ControlQueue();
         $_SESSION['control_queue_certificates'] = serialize($ctrlQueueCertificate);
 
@@ -192,7 +195,7 @@ class Session
        
 
         $ctrlQueueProfiles = new ControlQueue();
-        $_SESSION['control_queue_profiles'] = serialize($ctrlQueueProfiles);
+        $_SESSION['control_queue_profiles'] = serialize($ctrlQueueProfiles);*/
 
     }
 
@@ -240,7 +243,7 @@ class Session
             $_SESSION['total_reports_generated'] = 0;
             $_SESSION['until_waited_datetime'] = date("Y-m-d H:i:s");
             // Init control queues
-            self::initControlQueues();
+            //self::initControlQueues();
              
            // Define default time :
             $_SESSION["glpi_currenttime"] = date("Y-m-d H:i:s");

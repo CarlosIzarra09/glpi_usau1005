@@ -46,30 +46,9 @@ Session::checkLoginUser();
 if (isset($_POST["add"])) {
     $remind->check(-1, CREATE, $_POST);
 
-    $ctrlQueueAdd = unserialize($_SESSION['control_queue_reminders']);
-    $registry = $ctrlQueueAdd->getRegistryQueue();
-
-    $newID = false;
+    $newID = HandlerSubmitForm::add($remind, 'control_queue_reminders');;
    
-    if($ctrlQueueAdd->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $remind->add($_POST);
-    }
-
-
     if ($newID) {
-
-        $currentDatetime = new DateTime(null,new DateTimeZone('America/Lima'));
-              
-        if($registry->count() === 3){
-            $ctrlQueueAdd->popTopRegistryItem();
-        }
-        $ctrlQueueAdd->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
-
-        $_SESSION['control_queue_reminders'] = serialize($ctrlQueueAdd);
-
 
         Event::log(
             $newID,

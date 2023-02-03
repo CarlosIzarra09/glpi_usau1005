@@ -50,30 +50,10 @@ $soft = new Software();
 if (isset($_POST["add"])) {
     $soft->check(-1, CREATE, $_POST);
 
-    $ctrlQueueAddSoftware = unserialize($_SESSION['control_queue_softwares']);
-    $registry_softwares = $ctrlQueueAddSoftware->getRegistryQueue();
-
-    $newID = false;
-   
-    if($ctrlQueueAddSoftware->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $soft->add($_POST);
-    }
-
+    $newID = HandlerSubmitForm::add($soft, 'control_queue_softwares');
 
     if ($newID) {
-
-        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
        
-        if($registry_softwares->count() === 3){
-            $ctrlQueueAddSoftware->popTopRegistryItem();
-        }
-        $ctrlQueueAddSoftware->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
-    
-        $_SESSION['control_queue_softwares'] = serialize($ctrlQueueAddSoftware);
-        
         Event::log(
             $newID,
             "software",
