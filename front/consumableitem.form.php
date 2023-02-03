@@ -109,7 +109,7 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $constype->check($_POST["id"], UPDATE);
 
-    if ($constype->update($_POST)) {
+    if (HandlerSubmitForm::update($constype, 'constype_update_controller_queue')) {
         Event::log(
             $_POST["id"],
             "consumableitems",

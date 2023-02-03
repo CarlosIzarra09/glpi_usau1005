@@ -109,7 +109,8 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $netdevice->check($_POST["id"], UPDATE);
 
-    $netdevice->update($_POST);
+    //$netdevice->update($_POST);
+    HandlerSubmitForm::update($netdevice, 'netdevice_update_controller_queue');
     Event::log(
         $_POST["id"],
         "networkequipment",

@@ -63,7 +63,8 @@ if (isset($_POST["add"])) {
 ) {
     $prof->check($_POST['id'], UPDATE);
 
-    $prof->update($_POST);
+    //$prof->update($_POST);
+    HandlerSubmitForm::update($prof, 'prof_update_controller_queue');
     Html::back();
 }
 

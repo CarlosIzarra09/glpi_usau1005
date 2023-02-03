@@ -106,7 +106,8 @@ if (isset($_POST["add"])) {
     $ent->redirectToList();
 } else if (isset($_POST["update"])) {
     $ent->check($_POST["id"], UPDATE);
-    $ent->update($_POST);
+    //$ent->update($_POST);
+    HandlerSubmitForm::update($ent, 'ent_update_controller_queue');
     Event::log(
         $_POST["id"],
         "suppliers",

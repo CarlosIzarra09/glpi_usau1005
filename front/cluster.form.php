@@ -110,7 +110,9 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $cluster->check($_POST["id"], UPDATE);
 
-    $cluster->update($_POST);
+    //$cluster->update($_POST);
+    HandlerSubmitForm::update($cluster, 'cluster_update_controller_queue');
+
     Event::log(
         $_POST["id"],
         "cluster",

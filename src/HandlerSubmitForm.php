@@ -54,7 +54,32 @@ Class HandlerSubmitForm {
         return $newID;
     }
 
-    public static function update(){
+    public static function update($entity, string $nameUpdtQueue): bool{
+        if(!isset($_SESSION[$nameUpdtQueue])){
+            $ctrlQueue = new ControlQueue();
+            $_SESSION[$nameUpdtQueue] = serialize($ctrlQueue);
+        }
 
+        $ctrlQueueUpdate = unserialize($_SESSION[$nameUpdtQueue]);
+        $registry = $ctrlQueueUpdate->getRegistryQueue();
+
+        $success = 0;
+        if($ctrlQueueUpdate->checkAnormalTimestampOnQueueItems()){
+            Session::cleanOnLogout();
+            Session::redirectIfNotLoggedIn();
+        }else{
+            $success = $entity->update($_POST);
+        }
+
+        $currentDatetime = new DateTime(null,new DateTimeZone('America/Lima'));
+              
+        if($registry->count() === 3){
+            $ctrlQueueUpdate->popTopRegistryItem();
+        }
+        $ctrlQueueUpdate->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
+
+        $_SESSION[$nameUpdtQueue] = serialize($ctrlQueueUpdate);
+
+        return $success;
     }
 }

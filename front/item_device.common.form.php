@@ -97,8 +97,9 @@ if (isset($_POST["add"])) {
     Html::redirect($device->getLinkURL());
 } else if (isset($_POST["update"])) {
     $item_device->check($_POST["id"], UPDATE);
-    $item_device->update($_POST);
+    //$item_device->update($_POST);
 
+    HandlerSubmitForm::update($item_device, 'devsimcard_update_controller_queue');
     Event::log(
         $_POST["id"],
         get_class($item_device),

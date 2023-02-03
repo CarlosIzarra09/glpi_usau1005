@@ -113,7 +113,8 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $certificate->check($_POST["id"], UPDATE);
 
-    $certificate->update($_POST);
+    //$certificate->update($_POST);
+    HandlerSubmitForm::update($certificate, 'cert_update_controller_queue');
     Event::log(
         $_POST["id"],
         "certificates",

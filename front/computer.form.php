@@ -115,7 +115,8 @@ if (isset($_POST["add"])) {
    //update a computer
 } else if (isset($_POST["update"])) {
     $computer->check($_POST['id'], UPDATE);
-    $computer->update($_POST);
+    HandlerSubmitForm::update($computer, 'computer_update_controller_queue');
+    //$computer->update($_POST);
     Event::log(
         $_POST["id"],
         "computers",

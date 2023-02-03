@@ -111,7 +111,9 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $problem->check($_POST["id"], UPDATE);
 
-    $problem->update($_POST);
+    //$problem->update($_POST);
+    HandlerSubmitForm::update($problem, 'problem_update_controller_queue');
+
     Event::log(
         $_POST["id"],
         "problem",

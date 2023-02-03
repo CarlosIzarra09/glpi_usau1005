@@ -109,7 +109,9 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $pdu->check($_POST["id"], UPDATE);
 
-    $pdu->update($_POST);
+    //$pdu->update($_POST);
+    HandlerSubmitForm::update($pdu, 'pdu_update_controller_queue');
+
     Event::log(
         $_POST["id"],
         "pdus",

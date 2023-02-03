@@ -127,7 +127,8 @@ if (isset($_GET['getvcard'])) {
     Html::back();
 } else if (isset($_POST["update"])) {
     $user->check($_POST['id'], UPDATE);
-    $user->update($_POST);
+    //$user->update($_POST);
+    HandlerSubmitForm::update($user, 'user_update_controller_queue');
     Event::log(
         $_POST['id'],
         "users",

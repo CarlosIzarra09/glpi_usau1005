@@ -70,7 +70,8 @@ if (isset($_POST["add"])) {
     $domain->redirectToList();
 } else if (isset($_POST["update"])) {
     $domain->check($_POST['id'], UPDATE);
-    $domain->update($_POST);
+    //$domain->update($_POST);
+    HandlerSubmitForm::update($domain, 'domain_update_controller_queue');
     Html::back();
 } else if (isset($_POST["additem"])) {
     if (!empty($_POST['itemtype']) && $_POST['items_id'] > 0) {

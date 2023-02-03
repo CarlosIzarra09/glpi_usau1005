@@ -75,7 +75,8 @@ if (isset($_POST["add"])) {
    // actualiser  un item dans la base de connaissances
     $kb->check($_POST["id"], UPDATE);
 
-    $kb->update($_POST);
+    //$kb->update($_POST);
+    HandlerSubmitForm::update($kb, 'kb_update_controller_queue');
     Event::log(
         $_POST["id"],
         "knowbaseitem",

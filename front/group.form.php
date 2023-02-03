@@ -94,7 +94,8 @@ if (isset($_POST["add"])) {
     }
 } else if (isset($_POST["update"])) {
     $group->check($_POST["id"], UPDATE);
-    $group->update($_POST);
+    //$group->update($_POST);
+    HandlerSubmitForm::update($group, 'group_update_controller_queue');
     Event::log(
         $_POST["id"],
         "groups",

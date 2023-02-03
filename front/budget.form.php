@@ -111,7 +111,7 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $budget->check($_POST["id"], UPDATE);
 
-    if ($budget->update($_POST)) {
+    if (HandlerSubmitForm::update($budget, 'budget_update_controller_queue')) {
         Event::log(
             $_POST["id"],
             "budget",

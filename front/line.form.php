@@ -109,7 +109,8 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $line->check($_POST["id"], UPDATE);
 
-    $line->update($_POST);
+    //$line->update($_POST);
+    HandlerSubmitForm::update($line, 'line_update_controller_queue');
     Event::log(
         $_POST["id"],
         "lines",

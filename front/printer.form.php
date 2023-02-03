@@ -108,7 +108,8 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $print->check($_POST["id"], UPDATE);
 
-    $print->update($_POST);
+    HandlerSubmitForm::update($print, 'printer_update_controller_queue');
+    //$print->update($_POST);
     Event::log(
         $_POST["id"],
         "printers",

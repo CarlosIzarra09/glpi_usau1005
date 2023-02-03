@@ -109,7 +109,8 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $rack->check($_POST["id"], UPDATE);
 
-    $rack->update($_POST);
+    //$rack->update($_POST);
+    HandlerSubmitForm::update($rack, 'rack_update_controller_queue');
     Event::log(
         $_POST["id"],
         "racks",

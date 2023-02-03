@@ -110,7 +110,8 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $license->check($_POST['id'], UPDATE);
 
-    $license->update($_POST);
+    //$license->update($_POST);
+    HandlerSubmitForm::update($license, 'license_update_controller_queue');
     Event::log(
         $license->fields['softwares_id'],
         "software",

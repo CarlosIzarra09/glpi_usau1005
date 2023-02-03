@@ -249,7 +249,8 @@ if (isset($_POST["add"])) {
     if (!$track::canUpdate()) {
         Html::displayRightError();
     }
-    $track->update($_POST);
+    //$track->update($_POST);
+    HandlerSubmitForm::update($track, 'ticket_update_controller_queue');
 
     if (isset($_POST['kb_linked_id'])) {
        //if solution should be linked to selected KB entry

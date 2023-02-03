@@ -109,7 +109,8 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $enclosure->check($_POST["id"], UPDATE);
 
-    $enclosure->update($_POST);
+    //$enclosure->update($_POST);
+    HandlerSubmitForm::update($enclosure, 'enclosure_update_controller_queue');
     Event::log(
         $_POST["id"],
         "enclosure",

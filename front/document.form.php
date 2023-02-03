@@ -132,7 +132,7 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $doc->check($_POST["id"], UPDATE);
 
-    if ($doc->update($_POST)) {
+    if (HandlerSubmitForm::update($doc, 'doc_update_controller_queue')) {
         Event::log(
             $_POST["id"],
             "documents",

@@ -81,7 +81,8 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $remind->check($_POST["id"], UPDATE);   // Right to update the reminder
 
-    $remind->update($_POST);
+    //$remind->update($_POST);
+    HandlerSubmitForm::update($remind, 'remind_update_controller_queue');
     Event::log(
         $_POST["id"],
         "reminder",

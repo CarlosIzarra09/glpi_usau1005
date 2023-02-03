@@ -113,7 +113,7 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $contract->check($_POST['id'], UPDATE);
 
-    if ($contract->update($_POST)) {
+    if (HandlerSubmitForm::update($contract, 'contract_update_controller_queue')) {
         Event::log(
             $_POST["id"],
             "contracts",

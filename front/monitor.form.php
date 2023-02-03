@@ -109,7 +109,9 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $monitor->check($_POST["id"], UPDATE);
 
-    $monitor->update($_POST);
+    //$monitor->update($_POST);
+    HandlerSubmitForm::update($monitor, 'monitor_update_controller_queue');
+
     Event::log(
         $_POST["id"],
         "monitors",

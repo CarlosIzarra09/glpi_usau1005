@@ -109,7 +109,8 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $app->check($_POST["id"], UPDATE);
 
-    $app->update($_POST);
+    //$app->update($_POST);
+    HandlerSubmitForm::update($app, 'app_update_controller_queue');
     Event::log(
         $_POST["id"],
         "appliance",

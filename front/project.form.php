@@ -111,7 +111,8 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $project->check($_POST["id"], UPDATE);
 
-    $project->update($_POST);
+    //$project->update($_POST);
+    HandlerSubmitForm::update($project, 'project_update_controller_queue');
     Event::log(
         $_POST["id"],
         "project",

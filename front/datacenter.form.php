@@ -109,7 +109,8 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $datacenter->check($_POST["id"], UPDATE);
 
-    $datacenter->update($_POST);
+    //$datacenter->update($_POST);
+    HandlerSubmitForm::update($datacenter, 'datacenter_update_controller_queue');
     Event::log(
         $_POST["id"],
         "datacenters",

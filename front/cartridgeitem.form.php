@@ -109,7 +109,7 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $cartype->check($_POST["id"], UPDATE);
 
-    if ($cartype->update($_POST)) {
+    if (HandlerSubmitForm::update($cartype, 'cartype_update_controller_queue')) {
         Event::log(
             $_POST["id"],
             "cartridgeitems",

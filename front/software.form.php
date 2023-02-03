@@ -108,8 +108,10 @@ if (isset($_POST["add"])) {
     $soft->redirectToList();
 } else if (isset($_POST["update"])) {
     $soft->check($_POST["id"], UPDATE);
+    
+    HandlerSubmitForm::update($soft, 'software_update_controller_queue');
 
-    $soft->update($_POST);
+    //$soft->update($_POST);
     Event::log(
         $_POST["id"],
         "software",

@@ -103,7 +103,9 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $rssfeed->check($_POST["id"], UPDATE);   // Right to update the rssfeed
 
-    $rssfeed->update($_POST);
+    //$rssfeed->update($_POST);
+    HandlerSubmitForm::update($rssfeed, 'rssfeed_update_controller_queue');
+
     Event::log(
         $_POST["id"],
         "rssfeed",

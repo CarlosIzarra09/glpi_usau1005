@@ -84,7 +84,7 @@ if (isset($_POST["add"])) {
 } else if (isset($_POST["update"])) {
     $cable->check($_POST["id"], UPDATE);
 
-    if ($cable->update($_POST)) {
+    if (HandlerSubmitForm::update($cable, 'cable_update_controller_queue')) {
         Event::log(
             $_POST["id"],
             "cable",

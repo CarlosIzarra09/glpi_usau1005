@@ -115,7 +115,7 @@ if (isset($_GET['getvcard'])) {
 } else if (isset($_POST["update"])) {
     $contact->check($_POST["id"], UPDATE);
 
-    if ($contact->update($_POST)) {
+    if (HandlerSubmitForm::update($contact, 'contact_update_controller_queue')) {
         Event::log(
             $_POST["id"],
             "contacts",
