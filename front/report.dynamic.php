@@ -156,7 +156,8 @@ if (isset($_GET["item_type"]) && isset($_GET["display_type"])) {
             );*/
 
             if(strtotime(date("Y-m-d H:i:s")) < strtotime($_SESSION['until_waited_datetime'])){
-                $msg_redirect = "Realizaste muchas descargas, espera hasta las ".$_SESSION['until_waited_datetime']." para volver a intentarlo";
+                $dateObject = new DateTime($_SESSION['until_waited_datetime']);
+                $msg_redirect = "Realizaste muchas descargas, espera hasta las ".$dateObject->format('h:i:s A')." para volver a intentarlo";
 
                 
                 Session::addMessageAfterRedirect($msg_redirect,false,INFO,true);

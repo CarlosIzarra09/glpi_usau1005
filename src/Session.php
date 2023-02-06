@@ -210,7 +210,7 @@ class Session
     public static function init(Auth $auth)
     {
         global $CFG_GLPI;
-        
+        date_default_timezone_set("America/Lima");
 
         if ($auth->auth_succeded) {
            // Restart GLPI session : complete destroy to prevent lost datas
