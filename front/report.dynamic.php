@@ -75,6 +75,7 @@ function checkRightsToGenerateReport():bool{
 
         
         Session::addMessageAfterRedirect($msg_redirect,false,INFO,true);
+        Session::addMessageAfterRedirect('10 generaciones de reportes más y se cerrará la sesión.',false,WARNING,false);
         Html::back();
         return false; 
     }else{

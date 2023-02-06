@@ -242,6 +242,10 @@ class Session
             $_SESSION['n_reports_generated'] = 0;
             $_SESSION['total_reports_generated'] = 0;
             $_SESSION['until_waited_datetime'] = date("Y-m-d H:i:s");
+
+            $_SESSION['n_graphreports_generated'] = 0;
+            $_SESSION['total_graphreports_generated'] = 0;
+            $_SESSION['until_waited_datetime_graph'] = date("Y-m-d H:i:s");
             // Init control queues
             //self::initControlQueues();
              
