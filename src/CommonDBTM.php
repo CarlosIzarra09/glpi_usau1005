@@ -1320,6 +1320,11 @@ class CommonDBTM extends CommonGLPI
                 $this->fields['date_mod'] = $_SESSION["glpi_currenttime"];
             }
 
+
+            if(!$this->checkAgainIfMandatoryFieldsAreCorrect($this->input)){
+                return false;
+            }
+
             if ($this->checkUnicity(true, $options)) {
                 if ($this->addToDB() !== false) {
                     $this->post_addItem();
@@ -1368,6 +1373,9 @@ class CommonDBTM extends CommonGLPI
                         //Check if we have to automatically fill dates
                         Infocom::manageDateOnStatusChange($this);
                     }
+
+                    
+
                     Plugin::doHook(Hooks::ITEM_ADD, $this);
 
                     // As add have succeeded, clean the old input value
@@ -1380,6 +1388,14 @@ class CommonDBTM extends CommonGLPI
         }
 
         return false;
+    }
+
+
+    public function checkAgainIfMandatoryFieldsAreCorrect(array $input):bool{
+        /** 
+         * Override this method
+        */
+        return true;
     }
 
 

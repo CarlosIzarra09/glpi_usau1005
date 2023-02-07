@@ -234,12 +234,23 @@ if (isset($_POST["add"])) {
         );*/
 
         //$_SESSION['control_queue_tickets'] = serialize($ctrlQueueAddTicket);
+
+    /*$newID = false;
+    $fields_losed = $track->haveFieldsCorrect($_POST);
+    if(count($fields_losed) == 0) {
+        $newID = HandlerSubmitForm::add($track, 'control_queue_tickets'); 
+    }else{
+
+        foreach($fields_losed as $field){
+            Session::addMessageAfterRedirect('-El campo '.$field.' tiene data erronea o está ausente, no se podrá crear el ticket.',false,INFO,false);
+        }
+        HTML::back();
+    }*/
     
-    $newID = HandlerSubmitForm::add($track, 'control_queue_tickets');  
-      
+
+    $newID = HandlerSubmitForm::add($track, 'control_queue_tickets'); 
     if($newID){
         
-
         if ($_SESSION['glpibackcreated']) {
             Html::redirect($track->getLinkURL());
         }

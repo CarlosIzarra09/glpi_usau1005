@@ -562,6 +562,46 @@ class Ticket extends CommonITILObject
         return self::canupdate();
     }
 
+   
+    /*public function haveFieldsCorrect(array &$input = null):array{
+
+        $bad_fields = [];
+
+        if(!isset($input['content']) || empty($input['content'])){
+            array_push($bad_fields, 'descripcion');
+        }
+
+        if(!isset($input['status']) || empty($input['status'])
+            || ($input['status'] > 6 || $input['status'] < 1)){
+                array_push($bad_fields, 'estado');
+        }
+
+        if(!isset($input['type']) || empty($input['type'])
+        || ($input['type'] < 1 || $input['type'] > 2)){
+            array_push($bad_fields, 'tipo');
+        }
+
+
+        if(!isset($input['urgency']) || empty($input['urgency'])
+        || ($input['urgency'] > 5 || $input['urgency'] < 1)){
+            array_push($bad_fields, 'urgencia');
+        }
+
+        if(!isset($input['impact']) || empty($input['impact'])
+        || ($input['impact'] > 5 || $input['impact'] < 1)){
+            array_push($bad_fields, 'impacto');
+        }
+
+        if (
+            !isset($input['priority']) || empty($input['priority'])
+            || ($input['priority'] > 6 || $input['priority'] < 1)
+        ) {
+            array_push($bad_fields, 'prioridad');
+        }
+    
+
+        return $bad_fields;
+    }*/
 
     /**
      * Is the current user is a requester of the current ticket and have the right to update it ?
@@ -1956,6 +1996,79 @@ class Ticket extends CommonITILObject
         }
 
         return $input;
+    }
+
+
+    public function checkAgainIfMandatoryFieldsAreCorrect(array $input):bool{
+        $mandatory_missing = [];
+        $incorrect_format = [];
+
+        $fields_necessary = [
+        'id' => 'number',		
+        '_glpi_csrf_token' => 'string',		
+        '_skip_default_actor' => 'number',		
+        '_tickettemplate' => 'number',		
+        '_predefined_fields' => 'string',		
+        'name' => 'string',		
+        'content' => 'string',		
+        'entities_id' => 'number',		
+        'date' => '',		
+        'type' => 'number',		
+        'itilcategories_id' => 'number',		
+        'status' => 'number',		
+        'requesttypes_id' => 'number',		
+        'urgency' => 'number',		
+        'impact' => 'number',		
+        'priority' => 'number',		
+        'locations_id' => 'number',		
+        '_contracts_id' => 'number',		
+        'actiontime' => 'number',		
+        'validatortype' => 'number',		
+        '_add_validation' => 'number',	
+        '_notifications_actorname' => '',		
+        '_notifications_actortype' => '',		
+        '_notifications_actorindex' => '',		
+        '_notifications_alternative_email' => '',		
+        'my_items' => '',		
+        'itemtype' => 'number',		
+        'items_id' => 'number',		
+        'time_to_own' => '',		
+        'slas_id_tto' => 'number',		
+        'time_to_resolve' => '',		
+        'slas_id_ttr' => 'number',		
+        'internal_time_to_own' => '',		
+        'olas_id_tto' => 'number',		
+        'internal_time_to_resolve' => '',		
+        'olas_id_ttr' => 'number'
+        ];
+
+
+        foreach($fields_necessary as $key => $value){
+            
+            if(!isset($input[$key])){
+                array_push($mandatory_missing, $key); 
+            }
+
+            //if()
+
+
+
+        }
+
+
+
+
+        if (count($mandatory_missing)) {
+            //TRANS: %s are the fields concerned
+             $message = sprintf(
+                 __('Mandatory fields are not filled. Please correct: %s'),
+                 implode(", ", $mandatory_missing)
+             );
+             Session::addMessageAfterRedirect($message, false, ERROR);
+             return false;
+        }else{
+            return true;
+        }
     }
 
 
