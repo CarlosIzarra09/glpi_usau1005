@@ -2030,7 +2030,7 @@ class Ticket extends CommonITILObject
         '_notifications_actorindex' => '',		
         '_notifications_alternative_email' => '',		
         'my_items' => '',		
-        'itemtype' => 'number',		
+        'itemtype' => 'string',		
         'items_id' => 'number',		
         'time_to_own' => '',		
         'slas_id_tto' => 'number',		
@@ -2047,30 +2047,93 @@ class Ticket extends CommonITILObject
             
             if(!isset($input[$key])){
                 array_push($mandatory_missing, $key); 
+            }else{
+                //Si la key existe en $_POST
+
+                if($value == 'number' && !is_numeric($input[$key]) ){
+                    array_push($incorrect_format, $key);
+                }
+                else if($value == 'string' && !is_string($input[$key]) ){
+                    array_push($incorrect_format, $key);
+                }
             }
-
-            //if()
-
-
-
         }
 
-
+        //REGLA DE NOGOCIO:
 
 
         if (count($mandatory_missing)) {
             //TRANS: %s are the fields concerned
-             $message = sprintf(
-                 __('Mandatory fields are not filled. Please correct: %s'),
-                 implode(", ", $mandatory_missing)
-             );
-             Session::addMessageAfterRedirect($message, false, ERROR);
-             return false;
+            $message = sprintf(
+                __('No se enviaron los siguientes campos en la petición. Por favor corregir: %s'),
+                implode(", ", $mandatory_missing)
+            );
+            Session::addMessageAfterRedirect($message, false, ERROR);
+        }
+
+        if (count($incorrect_format)) {
+            //TRANS: %s are the fields concerned
+            $message = sprintf(
+                __('Los siguientes campos fueron enviados con formato incorrecto. Por favor corregir: %s'),
+                implode(", ", $incorrect_format)
+            );
+            Session::addMessageAfterRedirect($message, false, WARNING);
+        }
+
+
+        if(count($mandatory_missing) || count($incorrect_format)){
+            return false;
         }else{
-            return true;
+            return $this->checkSelectorFieldsInRange($input);
         }
     }
 
+    public function checkSelectorFieldsInRange(array &$input):bool{
+        $selector_fields_outrange = [];
+        if($input['type'] < 1 || $input['type'] > 2){
+            array_push($selector_fields_outrange,'type');
+        }
+        if($input['status'] < 1 || $input['status'] > 6){
+            array_push($selector_fields_outrange,'status');
+        }
+        if($input['urgency'] < 1 || $input['urgency'] > 5){
+            array_push($selector_fields_outrange,'urgency');
+        }
+        if($input['impact'] < 1 || $input['impact'] > 5){
+            array_push($selector_fields_outrange,'impact');
+        }
+        if($input['priority'] < 1 || $input['priority'] > 6){
+            array_push($selector_fields_outrange,'priority');
+        }
+        if($input['actiontime'] < 0 || $input['actiontime'] > 86400 ){
+            array_push($selector_fields_outrange,'actiontime/total duration');
+        }
+
+        if(count($selector_fields_outrange)){
+            $message = sprintf(
+                __('Los siguientes campos de selección fueron enviados con valores fuera de su rango. Por favor corregir: %s'),
+                implode(", ", $selector_fields_outrange)
+            );
+            Session::addMessageAfterRedirect($message, false, WARNING);
+            return false;
+        }else{
+            return true;
+        }
+
+
+        /*if(
+            ($input['type'] < 1 || $input['type'] > 2) ||
+            ($input['status'] < 1 || $input['status'] > 6) ||
+            ($input['urgency'] < 1 || $input['urgency'] > 5) ||
+            ($input['impact'] < 1 || $input['impact'] > 5) ||
+            ($input['priority'] < 1 || $input['priority'] > 6) ||
+            ($input['actiontime'] < 0 || $input['actiontime'] > 86400 )
+        ){
+            return false;
+        }else{
+            return true;
+        }*/
+    }
 
     public function post_addItem()
     {

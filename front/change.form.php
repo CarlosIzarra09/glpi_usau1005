@@ -53,28 +53,8 @@ $change = new Change();
 if (isset($_POST["add"])) {
     $change->check(-1, CREATE, $_POST);
 
-    $ctrlQueueAddChange = unserialize($_SESSION['control_queue_changes']);
-    $registry_changes = $ctrlQueueAddChange->getRegistryQueue();
-
-    $newID = false;
-   
-    if($ctrlQueueAddChange->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $change->add($_POST);
-    }
-
+    $newID = HandlerSubmitForm::add($change, 'control_queue_changes'); 
     if($newID){
-
-        $currentDatetime = DateTime::createFromFormat('U.u', number_format(microtime(true), 6, '.', ''));
-    
-        if($registry_changes->count() === 3){
-            $ctrlQueueAddChange->popTopRegistryItem();
-        }
-        $ctrlQueueAddChange->addRegistryItem($currentDatetime->format("Y-m-d H:i:s.u"));
-        
-        $_SESSION['control_queue_changes'] = serialize($ctrlQueueAddChange);
 
         Event::log(
             $newID,

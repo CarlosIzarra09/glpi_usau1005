@@ -1056,6 +1056,121 @@ class Problem extends CommonITILObject
         }
     }
 
+    public function checkAgainIfMandatoryFieldsAreCorrect(array $input):bool{
+        $mandatory_missing = [];
+        $incorrect_format = [];
+
+        $fields_necessary = [
+        'id' => 'number',		
+        '_glpi_csrf_token' => 'string',		
+        '_skip_default_actor' => 'number',		
+        '_problemtemplate' => 'number',		
+        '_predefined_fields' => 'string',		
+        'name' => 'string',		
+        'content' => 'string',		
+        'entities_id' => 'number',
+        'is_recursive' => 'number',		
+        'date' => '',
+        'time_to_resolve' => '',		
+        'itilcategories_id' => 'number',		
+        'status' => 'number',			
+        'urgency' => 'number',		
+        'impact' => 'number',		
+        'priority' => 'number',		 
+        'actiontime' => 'number',		
+        '_notifications_actorname' => '',		
+        '_notifications_actortype' => '',		
+        '_notifications_actorindex' => '',		
+        '_notifications_alternative_email' => '',		
+        'impactcontent' => '',		
+        'causecontent' => '',		
+        'symptomcontent' => ''		
+        ];
+
+
+        foreach($fields_necessary as $key => $value){
+            
+            if(!isset($input[$key])){
+                array_push($mandatory_missing, $key); 
+            }else{
+                //Si la key existe en $_POST
+
+                if($value == 'number' && !is_numeric($input[$key]) ){
+                    array_push($incorrect_format, $key);
+                }
+                else if($value == 'string' && !is_string($input[$key]) ){
+                    array_push($incorrect_format, $key);
+                }
+            }
+        }
+
+        //REGLA DE NOGOCIO:
+
+
+        if (count($mandatory_missing)) {
+            //TRANS: %s are the fields concerned
+            $message = sprintf(
+                __('No se enviaron los siguientes campos en la petición. Por favor corregir: %s'),
+                implode(", ", $mandatory_missing)
+            );
+            Session::addMessageAfterRedirect($message, false, ERROR);
+        }
+
+        if (count($incorrect_format)) {
+            //TRANS: %s are the fields concerned
+            $message = sprintf(
+                __('Los siguientes campos fueron enviados con formato incorrecto. Por favor corregir: %s'),
+                implode(", ", $incorrect_format)
+            );
+            Session::addMessageAfterRedirect($message, false, WARNING);
+        }
+
+
+        if(count($mandatory_missing) || count($incorrect_format)){
+            return false;
+        }else{
+            return $this->checkSelectorFieldsInRange($input);
+        }
+    }
+
+    public function checkSelectorFieldsInRange(array &$input):bool{
+        $selector_fields_outrange = [];
+       
+        if($input['status'] < 1 || $input['status'] > 8){
+            array_push($selector_fields_outrange,'status');
+        }
+        if($input['urgency'] < 1 || $input['urgency'] > 5){
+            array_push($selector_fields_outrange,'urgency');
+        }
+        if($input['impact'] < 1 || $input['impact'] > 5){
+            array_push($selector_fields_outrange,'impact');
+        }
+        if($input['priority'] < 1 || $input['priority'] > 6){
+            array_push($selector_fields_outrange,'priority');
+        }
+        if($input['actiontime'] < 0 || $input['actiontime'] > 86400 ){
+            array_push($selector_fields_outrange,'actiontime/total duration');
+        }
+
+        if(isset($input['date']) && isset($input['time_to_resolve'])){
+            if(strtotime($input['date']) > strtotime(isset($input['time_to_resolve']))){
+                array_push($selector_fields_outrange,'begin_date mayor a end_date');
+            }
+        }
+
+        if(count($selector_fields_outrange)){
+            $message = sprintf(
+                __('Los siguientes campos de selección fueron enviados con valores fuera de su rango. Por favor corregir: %s'),
+                implode(", ", $selector_fields_outrange)
+            );
+            Session::addMessageAfterRedirect($message, false, WARNING);
+            return false;
+        }else{
+            return true;
+        }
+
+    }
+
 
     /**
      * Get problems count
