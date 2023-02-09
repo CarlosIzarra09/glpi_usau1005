@@ -1129,11 +1129,11 @@ class Problem extends CommonITILObject
         if(count($mandatory_missing) || count($incorrect_format)){
             return false;
         }else{
-            return $this->checkSelectorFieldsInRange($input);
+            return $this->checkAppliedBusinessRules($input);
         }
     }
 
-    public function checkSelectorFieldsInRange(array &$input):bool{
+    public function checkAppliedBusinessRules(array &$input):bool{
         $selector_fields_outrange = [];
        
         if($input['status'] < 1 || $input['status'] > 8){

@@ -150,11 +150,11 @@ class TicketRecurrent extends CommonITILRecurrent
         if(count($mandatory_missing) || count($incorrect_format)){
             return false;
         }else{
-            return $this->checkSelectorFieldsInRange($input);
+            return $this->checkAppliedBusinessRules($input);
         }
     }
 
-    public function checkSelectorFieldsInRange(array &$input):bool{
+    public function checkAppliedBusinessRules(array &$input):bool{
         $selector_fields_outrange = [];
         
         if($input['is_active'] < 0 || $input['is_active'] > 1){
@@ -167,7 +167,7 @@ class TicketRecurrent extends CommonITILRecurrent
 
         if(isset($input['begin_date']) && isset($input['end_date'])){
             if(strtotime($input['begin_date']) > strtotime(isset($input['end_date']))){
-                array_push($selector_fields_outrange,'begin_date mayor a end_date');
+                array_push($selector_fields_outrange,'begin_date por encima de end_date');
             }
         }
 
