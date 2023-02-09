@@ -2023,7 +2023,7 @@ class Ticket extends CommonITILObject
         'locations_id' => 'number',		
         '_contracts_id' => 'number',		
         'actiontime' => 'number',		
-        'validatortype' => 'number',		
+        'validatortype' => 'string',		
         '_add_validation' => 'number',	
         '_notifications_actorname' => '',		
         '_notifications_actortype' => '',		
@@ -2046,15 +2046,17 @@ class Ticket extends CommonITILObject
         foreach($fields_necessary as $key => $value){
             
             if(!isset($input[$key])){
-                array_push($mandatory_missing, $key); 
+                array_push($mandatory_missing, $key);
+                break;       
             }else{
                 //Si la key existe en $_POST
-
                 if($value == 'number' && !is_numeric($input[$key]) ){
                     array_push($incorrect_format, $key);
+                    break;
                 }
                 else if($value == 'string' && !is_string($input[$key]) ){
                     array_push($incorrect_format, $key);
+                    break;
                 }
             }
         }
@@ -2065,7 +2067,7 @@ class Ticket extends CommonITILObject
         if (count($mandatory_missing)) {
             //TRANS: %s are the fields concerned
             $message = sprintf(
-                __('No se enviaron los siguientes campos en la petición. Por favor corregir: %s'),
+                __('No se envio el siguiente campo en la petición HTTP. Por favor corregir: %s'),
                 implode(", ", $mandatory_missing)
             );
             Session::addMessageAfterRedirect($message, false, ERROR);
@@ -2074,7 +2076,7 @@ class Ticket extends CommonITILObject
         if (count($incorrect_format)) {
             //TRANS: %s are the fields concerned
             $message = sprintf(
-                __('Los siguientes campos fueron enviados con formato incorrecto. Por favor corregir: %s'),
+                __('El siguiente campo fue enviado con tipo de dato incorrecto al esperado. Por favor corregir: %s'),
                 implode(", ", $incorrect_format)
             );
             Session::addMessageAfterRedirect($message, false, WARNING);
@@ -2090,51 +2092,66 @@ class Ticket extends CommonITILObject
 
     public function checkAppliedBusinessRules(array &$input):bool{
         $selector_fields_outrange = [];
+
         if($input['type'] < 1 || $input['type'] > 2){
             array_push($selector_fields_outrange,'type');
         }
-        if($input['status'] < 1 || $input['status'] > 6){
+        else if($input['status'] < 1 || $input['status'] > 6){
             array_push($selector_fields_outrange,'status');
         }
-        if($input['urgency'] < 1 || $input['urgency'] > 5){
+        else if($input['urgency'] < 1 || $input['urgency'] > 5){
             array_push($selector_fields_outrange,'urgency');
         }
-        if($input['impact'] < 1 || $input['impact'] > 5){
+        else if($input['impact'] < 1 || $input['impact'] > 5){
             array_push($selector_fields_outrange,'impact');
         }
-        if($input['priority'] < 1 || $input['priority'] > 6){
+        else if($input['priority'] < 1 || $input['priority'] > 6){
             array_push($selector_fields_outrange,'priority');
         }
-        if($input['actiontime'] < 0 || $input['actiontime'] > 86400 ){
+        else if($input['actiontime'] < 0 || $input['actiontime'] > 86400 ){
             array_push($selector_fields_outrange,'actiontime/total duration');
         }
 
-        
+        $selector_ids_incorrect = [];
 
+        if($input['entities_id'] != 0 && Entity::getById($input['entities_id']) == false){
+            array_push($selector_ids_incorrect,'entities_id');
+        }
+        else if($input['itilcategories_id'] != 0 && ITILCategory::getById($input['itilcategories_id']) == false){
+            array_push($selector_ids_incorrect,'itilcategories_id');
+        }
+        else if($input['requesttypes_id'] != 0 && RequestType::getById($input['requesttypes_id']) == false){
+            array_push($selector_ids_incorrect,'requesttypes_id');
+        }
+        else if($input['locations_id'] != 0 && Location::getById($input['locations_id']) == false){
+            array_push($selector_ids_incorrect,'locations_id');
+        }
+       
+
+ 
         if(count($selector_fields_outrange)){
             $message = sprintf(
-                __('Los siguientes campos de selección fueron enviados con valores fuera de su rango. Por favor corregir: %s'),
+                __('Se detectó al menos un campo fuera de su rango establecido. Por favor corregir: %s'),
                 implode(", ", $selector_fields_outrange)
             );
             Session::addMessageAfterRedirect($message, false, WARNING);
+        }
+
+        if(count($selector_ids_incorrect)){
+            $message = sprintf(
+                __('Se detectó al menos un campo con Id incorrecto. Por favor corregir: %s'),
+                implode(", ", $selector_ids_incorrect)
+            );
+            Session::addMessageAfterRedirect($message, false, ERROR);
+        }
+
+        if(count($selector_fields_outrange) || count($selector_ids_incorrect)){
             return false;
-        }else{
+        }
+        else{
             return true;
         }
 
-
-        /*if(
-            ($input['type'] < 1 || $input['type'] > 2) ||
-            ($input['status'] < 1 || $input['status'] > 6) ||
-            ($input['urgency'] < 1 || $input['urgency'] > 5) ||
-            ($input['impact'] < 1 || $input['impact'] > 5) ||
-            ($input['priority'] < 1 || $input['priority'] > 6) ||
-            ($input['actiontime'] < 0 || $input['actiontime'] > 86400 )
-        ){
-            return false;
-        }else{
-            return true;
-        }*/
     }
 
     public function post_addItem()

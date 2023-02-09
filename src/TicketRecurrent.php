@@ -161,24 +161,49 @@ class TicketRecurrent extends CommonITILRecurrent
             array_push($selector_fields_outrange,'is_active');
         }
 
-        if($input['periodicity'] < 0 || $input['periodicity'] > 315576000 ){
+        else if($input['periodicity'] < 0 || $input['periodicity'] > 315576000 ){
             array_push($selector_fields_outrange,'periodicity');
         }
 
-        if(isset($input['begin_date']) && isset($input['end_date'])){
-            if(strtotime($input['begin_date']) > strtotime(isset($input['end_date']))){
-                array_push($selector_fields_outrange,'begin_date por encima de end_date');
+        $timeunixDate =$input['begin_date'];
+        $timeunixTTR = $input['end_date'];
+
+        if( $timeunixDate !== false && $timeunixTTR !== false){
+
+            if($timeunixDate > $timeunixTTR){
+                array_push($selector_fields_outrange,'StarDate mayor a EndDate');
             }
+        }
+
+        $selector_ids_incorrect=[];
+
+        if($input['calendars_id'] != 0 && Calendar::getById($input['calendars_id']) == false){
+            array_push($selector_ids_incorrect,'calendars_id');
+        }
+        else if($input['tickettemplates_id'] != 0 && TicketTemplate::getById($input['tickettemplates_id']) == false){
+            array_push($selector_ids_incorrect,'tickettemplates_id');
         }
 
         if(count($selector_fields_outrange)){
             $message = sprintf(
-                __('Los siguientes campos de selección fueron enviados con valores fuera de su rango. Por favor corregir: %s'),
+                __('Se detectó al menos un campo fuera de su rango establecido. Por favor corregir: %s'),
                 implode(", ", $selector_fields_outrange)
             );
             Session::addMessageAfterRedirect($message, false, WARNING);
+        }
+
+        if(count($selector_ids_incorrect)){
+            $message = sprintf(
+                __('Se detectó al menos un campo con Id incorrecto. Por favor corregir: %s'),
+                implode(", ", $selector_ids_incorrect)
+            );
+            Session::addMessageAfterRedirect($message, false, ERROR);
+        }
+
+        if(count($selector_fields_outrange) || count($selector_ids_incorrect)){
             return false;
-        }else{
+        }
+        else{
             return true;
         }
 

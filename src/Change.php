@@ -998,7 +998,7 @@ class Change extends CommonITILObject
             'impact' => 'number',		
             'priority' => 'number',		 
             'actiontime' => 'number',
-            'validatortype' => 'number',
+            'validatortype' => 'string',
             '_add_validation' => 'number',		
             '_notifications_actorname' => '',		
             '_notifications_actortype' => '',		
@@ -1063,36 +1063,63 @@ class Change extends CommonITILObject
         if($input['status'] < 1 || $input['status'] > 14){
             array_push($selector_fields_outrange,'status');
         }
-        if($input['urgency'] < 1 || $input['urgency'] > 5){
+        else if($input['urgency'] < 1 || $input['urgency'] > 5){
             array_push($selector_fields_outrange,'urgency');
         }
-        if($input['impact'] < 1 || $input['impact'] > 5){
+        else if($input['impact'] < 1 || $input['impact'] > 5){
             array_push($selector_fields_outrange,'impact');
         }
-        if($input['priority'] < 1 || $input['priority'] > 6){
+        else if($input['priority'] < 1 || $input['priority'] > 6){
             array_push($selector_fields_outrange,'priority');
         }
-        if($input['actiontime'] < 0 || $input['actiontime'] > 86400 ){
+        else if($input['actiontime'] < 0 || $input['actiontime'] > 86400 ){
             array_push($selector_fields_outrange,'actiontime/total duration');
         }
+        else if($input['is_recursive'] < 0 || $input['is_recursive'] > 1){
+            array_push($selector_fields_outrange,'is_recursive solo puede ser 0 o 1');
+        }
 
-        if(isset($input['date']) && isset($input['time_to_resolve'])){
-            if(strtotime($input['date']) > strtotime(isset($input['time_to_resolve']))){
-                array_push($selector_fields_outrange,'begin_date mayor a end_date');
+        $timeunixDate = $input['date'];
+        $timeunixTTR = $input['time_to_resolve'];
+
+        if( $timeunixDate !== false && $timeunixTTR !== false){
+
+            if($timeunixDate > $timeunixTTR){
+                array_push($selector_fields_outrange,'DATE mayor a TimeToResolve');
             }
+        }
+
+        $selector_ids_incorrect=[];
+
+        if($input['entities_id'] != 0 && Entity::getById($input['entities_id']) == false){
+            array_push($selector_ids_incorrect,'entities_id');
+        }
+        else if($input['itilcategories_id'] != 0 && ITILCategory::getById($input['itilcategories_id']) == false){
+            array_push($selector_ids_incorrect,'itilcategories_id');
         }
 
         if(count($selector_fields_outrange)){
             $message = sprintf(
-                __('Los siguientes campos de selección fueron enviados con valores fuera de su rango. Por favor corregir: %s'),
+                __('Se detectó al menos un campo fuera de su rango establecido. Por favor corregir: %s'),
                 implode(", ", $selector_fields_outrange)
             );
             Session::addMessageAfterRedirect($message, false, WARNING);
-            return false;
-        }else{
-            return true;
         }
 
+        if(count($selector_ids_incorrect)){
+            $message = sprintf(
+                __('Se detectó al menos un campo con Id incorrecto. Por favor corregir: %s'),
+                implode(", ", $selector_ids_incorrect)
+            );
+            Session::addMessageAfterRedirect($message, false, ERROR);
+        }
+
+        if(count($selector_fields_outrange) || count($selector_ids_incorrect)){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 
 
