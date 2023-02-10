@@ -165,8 +165,9 @@ class TicketRecurrent extends CommonITILRecurrent
             array_push($selector_fields_outrange,'periodicity');
         }
 
-        $timeunixDate =$input['begin_date'];
-        $timeunixTTR = $input['end_date'];
+        $timeunixDate = strtotime($input['begin_date']);
+        $timeunixTTR = strtotime($input['end_date']);
+
 
         if( $timeunixDate !== false && $timeunixTTR !== false){
 
