@@ -1155,8 +1155,8 @@ class Problem extends CommonITILObject
             array_push($selector_fields_outrange,'is_recursive solo puede ser 0 o 1');
         }
 
-        $timeunixDate =$input['date'];
-        $timeunixTTR = $input['time_to_resolve'];
+        $timeunixDate = strtotime($input['begin_date']);
+        $timeunixTTR = strtotime($input['end_date']);
 
         if( $timeunixDate !== false && $timeunixTTR !== false){
 

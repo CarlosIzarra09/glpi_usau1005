@@ -145,8 +145,8 @@ class RecurrentChange extends CommonITILRecurrent
             array_push($selector_fields_outrange,'create_before');
         }
 
-        $timeunixDate = strtotime($input['begin_date']);
-        $timeunixTTR = strtotime($input['end_date']);
+         = strtotime($input['begin_date']);
+        $timeunixTTR = strtotime($input['end_date']);$timeunixDate
 
         if( $timeunixDate !== false && $timeunixTTR !== false){
 
