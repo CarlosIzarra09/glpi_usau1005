@@ -521,7 +521,7 @@ class NetworkEquipment extends CommonDBTM
         $fields_necessary = [
         'entities_id' => 'number',		
         '_glpi_csrf_token' => 'string',		
-        'is_recursive' => 'bool',		
+        //'is_recursive' => 'bool',		
         'name' => 'string',
         'states_id' => 'number',
         'locations_id' => 'number',

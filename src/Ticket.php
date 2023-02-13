@@ -2020,7 +2020,7 @@ class Ticket extends CommonITILObject
         'urgency' => 'number',		
         'impact' => 'number',		
         'priority' => 'number',		
-        'locations_id' => 'number',		
+        //'locations_id' => 'number',		
         '_contracts_id' => 'number',		
         'actiontime' => 'number',		
         'validatortype' => 'string',		

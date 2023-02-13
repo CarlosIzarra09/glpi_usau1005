@@ -612,7 +612,7 @@ class Computer extends CommonDBTM
         $fields_necessary = [
         'entities_id' => 'number',		
         '_glpi_csrf_token' => 'string',		
-        'is_recursive' => 'number',		
+        //'is_recursive' => 'number',		
         'name' => 'string',
         'states_id' => 'number',
         'locations_id' => 'number',

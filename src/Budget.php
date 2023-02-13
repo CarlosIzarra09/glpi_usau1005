@@ -233,7 +233,7 @@ class Budget extends CommonDropdown
         $fields_necessary = [
             'entities_id' => 'number',
             '_glpi_csrf_token' => 'string',
-            'is_recursive' => 'number',
+            //'is_recursive' => 'number',
             'name' => 'string',
             'budgettypes_id' => 'number',
             'value' => 'number',

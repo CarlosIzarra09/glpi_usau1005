@@ -881,7 +881,7 @@ class Consumable extends CommonDBChild
         $fields_necessary = [
         'entities_id' => 'number',		
         '_glpi_csrf_token' => 'string',		
-        'is_recursive' => 'bool',		
+        //'is_recursive' => 'bool',		
         'name' => 'string',
         'locations_id' => 'number',
         'consumableitemtypes_id' => 'number',

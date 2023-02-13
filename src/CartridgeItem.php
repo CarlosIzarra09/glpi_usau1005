@@ -608,7 +608,7 @@ class CartridgeItem extends CommonDBTM
         $fields_necessary = [
         'entities_id' => 'number',		
         '_glpi_csrf_token' => 'string',		
-        'is_recursive' => 'bool',		
+        //'is_recursive' => 'bool',		
         'name' => 'string',
         'locations_id' => 'number',
         'cartridgeitemtypes_id' => 'number',

@@ -96,7 +96,7 @@ class TicketRecurrent extends CommonITILRecurrent
         $fields_necessary = [
             'entities_id' => 'number',
             '_glpi_csrf_token' => 'string',
-            'is_recursive' => 'number',
+            //'is_recursive' => 'number',
             'name' => 'string',
             'comment' => 'string',
             'is_active' => 'number',

@@ -1069,7 +1069,7 @@ class Problem extends CommonITILObject
         'name' => 'string',		
         'content' => 'string',		
         'entities_id' => 'number',
-        'is_recursive' => 'number',		
+        //'is_recursive' => 'number',		
         'date' => '',
         'time_to_resolve' => '',		
         'itilcategories_id' => 'number',		

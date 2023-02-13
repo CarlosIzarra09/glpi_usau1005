@@ -72,7 +72,7 @@ class RecurrentChange extends CommonITILRecurrent
         $fields_necessary = [
             'entities_id' => 'number',
             '_glpi_csrf_token' => 'string',
-            'is_recursive' => 'number',
+            //'is_recursive' => 'number',
             'name' => 'string',
             'comment' => 'string',
             'is_active' => 'number',
@@ -145,8 +145,8 @@ class RecurrentChange extends CommonITILRecurrent
             array_push($selector_fields_outrange,'create_before');
         }
 
-         = strtotime($input['begin_date']);
-        $timeunixTTR = strtotime($input['end_date']);$timeunixDate
+        $timeunixDate = strtotime($input['begin_date']);
+        $timeunixTTR = strtotime($input['end_date']);
 
         if( $timeunixDate !== false && $timeunixTTR !== false){
 
