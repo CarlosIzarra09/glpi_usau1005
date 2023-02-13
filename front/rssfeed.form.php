@@ -50,43 +50,22 @@ Session::checkLoginUser();
 if (isset($_POST["add"])) {
     $rssfeed->check(-1, CREATE, $_POST);
 
-    $ctrlQueueAdd = unserialize($_SESSION['control_queue_rssfeeds']);
-    $registry = $ctrlQueueAdd->getRegistryQueue();
-
-    $newID = false;
-   
-    if($ctrlQueueAdd->checkAnormalTimestampOnQueueItems()){
-        Session::cleanOnLogout();
-        Session::redirectIfNotLoggedIn();
-    }else{
-        $newID = $rssfeed->add($_POST);
-    }
-
+    $newID = HandlerSubmitForm::add($rssfeed, 'control_queue_reminders');;
 
     if ($newID) {
-
-        $currentDatetime = new DateTime(null, new DateTimeZone('America/Lima'));
-
-        if ($registry->count() === 3) {
-            $ctrlQueueAdd->popTopRegistryItem();
-        }
-        $ctrlQueueAdd->addRegistryItem($currentDatetime->format('Y-m-d H:i:s'));
-
-        $_SESSION['control_queue_rssfeeds'] = serialize($ctrlQueueAdd);
+        Event::log(
+            $newID,
+            "rssfeed",
+            4,
+            "tools",
+            sprintf(
+                __('%1$s adds the item %2$s'),
+                $_SESSION["glpiname"],
+                $rssfeed->fields["name"]
+            )
+        );
     }
 
-
-    Event::log(
-        $newID,
-        "rssfeed",
-        4,
-        "tools",
-        sprintf(
-            __('%1$s adds the item %2$s'),
-            $_SESSION["glpiname"],
-            $rssfeed->fields["name"]
-        )
-    );
     Html::redirect($rssfeed->getFormURLWithID($newID));
 } else if (isset($_POST["purge"])) {
     $rssfeed->check($_POST["id"], PURGE);
