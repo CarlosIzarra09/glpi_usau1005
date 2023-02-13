@@ -63,378 +63,7 @@ class Contract extends CommonDBTM
         ];
     }
 
-    public function add(array $input, $options = [], $history = true)
-    {
-        global $DB, $CFG_GLPI;
-
-        if ($DB->isSlave()) {
-            return false;
-        }
-
-        // This means we are not adding a cloned object
-        if (
-            (!Toolbox::hasTrait($this, \Glpi\Features\Clonable::class) || !isset($input['clone']))
-            && method_exists($this, 'clone')
-        ) {
-            // This means we are asked to clone the object (old way). This will clone the clone method
-            // that will set the clone parameter to true
-            if (isset($input['_oldID'])) {
-                $id_to_clone = $input['_oldID'];
-            }
-            if (isset($input['id'])) {
-                $id_to_clone = $input['id'];
-            }
-            if (isset($id_to_clone) && $this->getFromDB($id_to_clone)) {
-                if ($clone_id = $this->clone($input, $history)) {
-                    $this->getFromDB($clone_id); // Load created items fields
-                }
-                return $clone_id;
-            }
-        }
-
-        
-        if(!empty(trim($input['accounting_number']))){
-            
-            if((float)$input['accounting_number'] < 0){
-                $input['accounting_number'] = 0;
-            }
-
-            $input['accounting_number'] = round((float) $input['accounting_number']);
-        }
-
-        if(!empty(trim($input['num']))){
-            
-            if((float)$input['num'] < 0){
-                $input['num'] = 0;
-            }
-
-            $input['num'] = round((float) $input['num']);
-        }
-
-        // Store input in the object to be available in all sub-method / hook
-        $this->input = $input;
-
-        // Manage the _no_history
-        if (!isset($this->input['_no_history'])) {
-            $this->input['_no_history'] = !$history;
-        }
-
-        if (isset($this->input['add'])) {
-            // Input from the interface
-            // Save this data to be available if add fail
-            $this->saveInput();
-        }
-
-        if (isset($this->input['add'])) {
-            $this->input['_add'] = $this->input['add'];
-            unset($this->input['add']);
-        }
-
-        // Call the plugin hook - $this->input can be altered
-        // This hook get the data from the form, not yet altered
-        Plugin::doHook(Hooks::PRE_ITEM_ADD, $this);
-
-        if ($this->input && is_array($this->input)) {
-            $this->input = $this->prepareInputForAdd($this->input);
-        }
-
-        if ($this->input && is_array($this->input)) {
-            // Call the plugin hook - $this->input can be altered
-            // This hook get the data altered by the object method
-            Plugin::doHook(Hooks::POST_PREPAREADD, $this);
-        }
-
-        if ($this->input && is_array($this->input)) {
-           //Check values to inject
-            $this->filterValues(!isCommandLine());
-        }
-
-        //Process business rules for assets
-        $this->assetBusinessRules(\RuleAsset::ONADD);
-
-        if ($this->input && is_array($this->input)) {
-            $this->fields = [];
-            $table_fields = $DB->listFields($this->getTable());
-
-            $this->pre_addInDB();
-
-            // fill array for add
-            $this->cleanLockedsOnAdd();
-            foreach (array_keys($this->input) as $key) {
-                if (
-                    ($key[0] != '_')
-                    && isset($table_fields[$key])
-                ) {
-                    $this->fields[$key] = $this->input[$key];
-                }
-            }
-
-            // Auto set date_creation if exsist
-            if (isset($table_fields['date_creation']) && !isset($this->input['date_creation'])) {
-                $this->fields['date_creation'] = $_SESSION["glpi_currenttime"];
-            }
-
-            // Auto set date_mod if exsist
-            if (isset($table_fields['date_mod']) && !isset($this->input['date_mod'])) {
-                $this->fields['date_mod'] = $_SESSION["glpi_currenttime"];
-            }
-
-            if ($this->checkUnicity(true, $options)) {
-                if ($this->addToDB() !== false) {
-                    $this->post_addItem();
-                    if ($this instanceof CacheableListInterface) {
-                        $this->invalidateListCache();
-                    }
-                    $this->addMessageOnAddAction();
-
-                    if ($this->dohistory && $history) {
-                        $changes = [
-                            0,
-                            '',
-                            '',
-                        ];
-                        Log::history(
-                            $this->fields["id"],
-                            $this->getType(),
-                            $changes,
-                            0,
-                            Log::HISTORY_CREATE_ITEM
-                        );
-                    }
-
-                    // Auto create infocoms
-                    if (
-                        isset($CFG_GLPI["auto_create_infocoms"]) && $CFG_GLPI["auto_create_infocoms"]
-                        && (!isset($input['clone']) || !$input['clone'])
-                        && Infocom::canApplyOn($this)
-                    ) {
-                        $ic = new Infocom();
-                        if (!$ic->getFromDBforDevice($this->getType(), $this->fields['id'])) {
-                            $ic->add(['itemtype' => $this->getType(),
-                                'items_id' => $this->fields['id']
-                            ]);
-                        }
-                    }
-
-                    // If itemtype is in infocomtype and if states_id field is filled
-                    // and item is not a template
-                    if (
-                        Infocom::canApplyOn($this)
-                        && isset($this->input['states_id'])
-                            && (!isset($this->input['is_template'])
-                                || !$this->input['is_template'])
-                    ) {
-                        //Check if we have to automatically fill dates
-                        Infocom::manageDateOnStatusChange($this);
-                    }
-                    Plugin::doHook(Hooks::ITEM_ADD, $this);
-
-                    // As add have succeeded, clean the old input value
-                    if (isset($this->input['_add'])) {
-                        $this->clearSavedInput();
-                    }
-                    return $this->fields['id'];
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public function update(array $input, $history = 1, $options = [])
-    {
-        global $DB, $GLPI_CACHE;
-
-        if ($DB->isSlave()) {
-            return false;
-        }
-
-        if (!array_key_exists(static::getIndexName(), $input)) {
-            return false;
-        }
-
-        if (!$this->getFromDB($input[static::getIndexName()])) {
-            return false;
-        }
-
-        if(!empty(trim($input['accounting_number']))){
-            
-            if((float)$input['accounting_number'] < 0){
-                $input['accounting_number'] = 0;
-            }
-
-            $input['accounting_number'] = round((float) $input['accounting_number']);
-        }
-
-        if(!empty(trim($input['num']))){
-            
-            if((float)$input['num'] < 0){
-                $input['num'] = 0;
-            }
-
-            $input['num'] = round((float) $input['num']);
-        }
-        
-       // Store input in the object to be available in all sub-method / hook
-        $this->input = $input;
-
-       // Manage the _no_history
-        if (!isset($this->input['_no_history'])) {
-            $this->input['_no_history'] = !$history;
-        }
-
-        if (isset($this->input['update'])) {
-           // Input from the interface
-           // Save this data to be available if add fail
-            $this->saveInput();
-        }
-
-        if (isset($this->input['update'])) {
-            $this->input['_update'] = $this->input['update'];
-            unset($this->input['update']);
-        }
-
-       // Plugin hook - $this->input can be altered
-        Plugin::doHook(Hooks::PRE_ITEM_UPDATE, $this);
-        if ($this->input && is_array($this->input)) {
-            $this->input = $this->prepareInputForUpdate($this->input);
-            $this->filterValues(!isCommandLine());
-        }
-
-       //Process business rules for assets
-        $this->assetBusinessRules(\RuleAsset::ONUPDATE);
-
-       // Valid input for update
-        if ($this->checkUnicity(false, $options)) {
-            if ($this->input && is_array($this->input)) {
-               // Fill the update-array with changes
-                $x               = 0;
-                $this->updates   = [];
-                $this->oldvalues = [];
-
-                foreach (array_keys($this->input) as $key) {
-                    if ($DB->fieldExists(static::getTable(), $key)) {
-                      // Prevent history for date statement (for date for example)
-                        if (
-                            is_null($this->fields[$key])
-                            && ($this->input[$key] == 'NULL')
-                        ) {
-                             $this->fields[$key] = 'NULL';
-                        }
-                      // Compare item
-                        $ischanged = true;
-                        $searchopt = $this->getSearchOptionByField('field', $key, $this->getTable());
-                        if (isset($searchopt['datatype'])) {
-                            switch ($searchopt['datatype']) {
-                                case 'string':
-                                case 'text':
-                                    $ischanged = (strcmp(
-                                        (string)$DB->escape($this->fields[$key]),
-                                        (string)$this->input[$key]
-                                    ) != 0);
-                                    break;
-
-                                case 'itemlink':
-                                    if ($key == 'name') {
-                                        $ischanged = (strcmp(
-                                            (string)$DB->escape($this->fields[$key]),
-                                            (string)$this->input[$key]
-                                        ) != 0);
-                                        break;
-                                    }
-                               // else default
-
-                                default:
-                                    $ischanged = ($DB->escape($this->fields[$key]) != $this->input[$key]);
-                                    break;
-                            }
-                        } else {
-                         // No searchoption case
-                            $ischanged = ($DB->escape($this->fields[$key]) != $this->input[$key]);
-                        }
-                        if ($ischanged) {
-                            if ($key != "id") {
-                         // Store old values
-                                if (!in_array($key, $this->history_blacklist)) {
-                                     $this->oldvalues[$key] = $this->fields[$key];
-                                }
-
-                                $this->fields[$key] = $this->input[$key];
-                                $this->updates[$x]  = $key;
-                                $x++;
-                            }
-                        }
-                    }
-                }
-                if (count($this->updates)) {
-                    if (array_key_exists('date_mod', $this->fields)) {
-                        // is a non blacklist field exists
-                        if (count(array_diff($this->updates, $this->history_blacklist)) > 0) {
-                            $this->fields['date_mod'] = $_SESSION["glpi_currenttime"];
-                            $this->updates[$x++]      = 'date_mod';
-                        }
-                    }
-                    $this->pre_updateInDB();
-
-                    $this->cleanLockeds();
-                    if (count($this->updates)) {
-                        if (
-                            $this->updateInDB(
-                                $this->updates,
-                                ($this->dohistory && $history ? $this->oldvalues
-                                : [])
-                            )
-                        ) {
-                            $this->manageLocks();
-                            $this->addMessageOnUpdateAction();
-                            Plugin::doHook(Hooks::ITEM_UPDATE, $this);
-
-                            //Fill forward_entity_to array with itemtypes coming from plugins
-                            if (isset(self::$plugins_forward_entity[$this->getType()])) {
-                                foreach (self::$plugins_forward_entity[$this->getType()] as $itemtype) {
-                                    static::$forward_entity_to[] = $itemtype;
-                                }
-                            }
-                           // forward entity information if needed
-                            if (
-                                count(static::$forward_entity_to)
-                                && (in_array("entities_id", $this->updates)
-                                || in_array("is_recursive", $this->updates))
-                            ) {
-                                 $this->forwardEntityInformations();
-                            }
-
-                           // If itemtype is in infocomtype and if states_id field is filled
-                           // and item not a template
-                            if (
-                                Infocom::canApplyOn($this)
-                                && in_array('states_id', $this->updates)
-                                && ($this->getField('is_template') != NOT_AVAILABLE)
-                            ) {
-                               //Check if we have to automatical fill dates
-                                Infocom::manageDateOnStatusChange($this, false);
-                            }
-                        }
-                    }
-                }
-
-                // As update have suceed, clean the old input value
-                if (isset($this->input['_update'])) {
-                    $this->clearSavedInput();
-                }
-
-                $this->post_updateItem($history);
-                if ($this instanceof CacheableListInterface) {
-                    $this->invalidateListCache();
-                }
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
+ 
 
     public static function getTypeName($nb = 0)
     {
@@ -2149,6 +1778,136 @@ class Contract extends CommonDBTM
             echo "<tr class='tab_bg_2'>";
             echo "<td colspan='6' ><i>" . __('No item.') . "</i></td></tr>";
         }
+    }
+
+    public function checkAgainIfMandatoryFieldsAreCorrect(array $input):bool{
+        $mandatory_missing = [];
+        $incorrect_format = [];
+
+        $fields_necessary = [
+            'entities_id' => 'number',
+            '_glpi_csrf_token' => 'string',
+            //'is_recursive' => '',
+            'name' => 'string',
+            'states_id' => 'number',
+            'contracttypes_id' => 'number',
+            'comment' => 'string',
+            'begin_date' => '',
+            'num' => 'string',
+            'duration' => 'number', //up to 120
+            'notice' => 'number',//up to 120
+            'accounting_number' => 'string',
+            'periodicity' => 'number', //up to 60
+            'billing' => 'number',
+            'renewal' => 'number',//0 - 2
+            'max_links_allowed' => 'number',//up to 200000
+            'alert' => 'number',
+
+            'week_begin_hour' => '',
+            'week_end_hour' => '',
+            'use_saturday' => 'bool',
+            'saturday_begin_hour' => '',
+            'saturday_end_hour' => '',
+            'use_sunday' => 'bool',
+            'sunday_begin_hour' => '',
+            'sunday_end_hour' => ''
+        ];
+
+
+        foreach($fields_necessary as $key => $value){
+            
+            if(!isset($input[$key])){
+                array_push($mandatory_missing, $key);
+                break;       
+            }else{
+                //Si la key existe en $_POST
+                if($value == 'number' && !is_numeric($input[$key]) ){
+                    array_push($incorrect_format, $key);
+                    break;
+                }
+                else if($value == 'string' && !is_string($input[$key]) ){
+                    array_push($incorrect_format, $key);
+                    break;
+                }
+                else if($value == 'bool' && !($input[$key] == '0' || $input[$key] == '1') ){
+                    array_push($incorrect_format, $key);
+                    break;
+                }
+                
+               
+            }
+        }
+
+        //REGLA DE NOGOCIO:
+
+
+        if (count($mandatory_missing)) {
+            //TRANS: %s are the fields concerned
+            $message = sprintf(
+                __('No se envio el siguiente campo en la petición HTTP. Por favor corregir: %s'),
+                implode(", ", $mandatory_missing)
+            );
+            Session::addMessageAfterRedirect($message, false, ERROR);
+        }
+
+        if (count($incorrect_format)) {
+            //TRANS: %s are the fields concerned
+            $message = sprintf(
+                __('El siguiente campo fue enviado con tipo de dato incorrecto al esperado. Por favor corregir: %s'),
+                implode(", ", $incorrect_format)
+            );
+            Session::addMessageAfterRedirect($message, false, WARNING);
+        }
+
+
+        if(count($mandatory_missing) || count($incorrect_format)){
+            return false;
+        }else{
+            return $this->checkAppliedBusinessRules($input);
+        }
+    }
+
+    public function checkAppliedBusinessRules(array &$input):bool{
+        
+        $selector_ids_incorrect = [];
+
+        if($input['entities_id'] != 0 && Entity::getById($input['entities_id']) == false){
+            array_push($selector_ids_incorrect,'entities_id');
+        }
+        else if($input['states_id'] != 0 && State::getById($input['states_id']) == false){
+            array_push($selector_ids_incorrect,'states_id');
+        }
+        else if($input['contracttypes_id'] != 0 && ContractType::getById($input['contracttypes_id']) == false){
+            array_push($selector_ids_incorrect,'contracttypes_id');
+        }
+
+        if($input['duration'] > 120){
+            array_push($selector_ids_incorrect,'duration fuera de rango');
+        }else if($input['notice'] > 120){
+            array_push($selector_ids_incorrect,'notice fuera de rango');
+        }else if($input['periodicity'] > 60){
+            array_push($selector_ids_incorrect,'periodicity fuera de rango');
+        }else if($input['renewal'] > 2 || $input['renewal'] < 0 ){
+            array_push($selector_ids_incorrect,'renewal fuera de rango');
+        }
+
+       
+    
+        if(count($selector_ids_incorrect)){
+            $message = sprintf(
+                __('Se detectó al menos un campo con Id incorrecto. Por favor corregir: %s'),
+                implode(", ", $selector_ids_incorrect)
+            );
+            Session::addMessageAfterRedirect($message, false, ERROR);
+        }
+
+        if(count($selector_ids_incorrect)){
+            return false;
+        }
+        else{
+            return true;
+        }
+
     }
 
     public static function getIcon()

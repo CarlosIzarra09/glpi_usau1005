@@ -295,9 +295,13 @@ class Budget extends CommonDropdown
             array_push($selector_fields_outrange,'value');
         }
 
-        if(isset($input['begin_date']) && isset($input['end_date'])){
-            if(strtotime($input['begin_date']) > strtotime(isset($input['end_date']))){
-                array_push($selector_fields_outrange,'begin_date mayor a end_date');
+        $timeunixDate = strtotime($input['begin_date']);
+        $timeunixTTR = strtotime($input['end_date']);
+
+        if( $timeunixDate !== false && $timeunixTTR !== false){
+
+            if($timeunixDate > $timeunixTTR){
+                array_push($selector_fields_outrange,'DATE mayor a TimeToResolve');
             }
         }
 
